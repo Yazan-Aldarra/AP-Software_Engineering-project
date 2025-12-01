@@ -31,3 +31,6 @@ C:\Users\yazan\OneDrive\سطح المكتب\AP Hogeschool\AP-J2\software_enginee
 C:\Users\yazan\OneDrive\سطح المكتب\AP Hogeschool\AP-J2\software_engineering\project\obj\Debug\net9.0\project.pdb
 C:\Users\yazan\OneDrive\سطح المكتب\AP Hogeschool\AP-J2\software_engineering\project\obj\Debug\net9.0\project.genruntimeconfig.cache
 C:\Users\yazan\OneDrive\سطح المكتب\AP Hogeschool\AP-J2\software_engineering\project\obj\Debug\net9.0\ref\project.dll
+C:\Users\yazan\OneDrive\سطح المكتب\AP Hogeschool\AP-J2\software_engineering\project\bin\Debug\net9.0\Content\Incubus Sprite Sheet.xnb
+C:\Users\yazan\OneDrive\سطح المكتب\AP Hogeschool\AP-J2\software_engineering\project\obj\Debug\net9.0\project.sourcelink.json
+C:\Users\yazan\OneDrive\سطح المكتب\AP Hogeschool\AP-J2\software_engineering\project\bin\Debug\net9.0\Content\Player_Sprite.xnb
