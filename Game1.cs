@@ -1,5 +1,4 @@
-﻿using System.Runtime.InteropServices;
-using System.Threading;
+﻿using System.Security;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -10,9 +9,8 @@ public class Game1 : Game
 {
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
+    private Player player;
     private Texture2D playerTexture;
-    private int MoveWith;
-    private Rectangle PlayerRectangle;
     public Game1()
     {
         _graphics = new GraphicsDeviceManager(this);
@@ -22,9 +20,7 @@ public class Game1 : Game
 
     protected override void Initialize()
     {
-        // TODO: Add your initialization logic here
 
-        PlayerRectangle = new Rectangle(0, 0, 96, 64);
         base.Initialize();
     }
 
@@ -32,8 +28,8 @@ public class Game1 : Game
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-        // TODO: use this.Content to load your game content here
         playerTexture = Content.Load<Texture2D>("Player_Sprite");
+        InitializeGameObjects();
     }
 
     protected override void Update(GameTime gameTime)
@@ -41,24 +37,27 @@ public class Game1 : Game
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
 
-        // TODO: Add your update logic here
-
+        player.Update();
         base.Update(gameTime);
     }
 
+    private void InitializeGameObjects()
+    {
+        player = new Player(playerTexture, 8, 5);
+    }
     protected override void Draw(GameTime gameTime)
     {
         GraphicsDevice.Clear(Color.CornflowerBlue);
 
         // TODO: Add your drawing code here
         _spriteBatch.Begin();
-        _spriteBatch.Draw(playerTexture, new Vector2(0,GraphicsDevice.Viewport.Height-PlayerRectangle.Height*2), PlayerRectangle, Color.White, 0,  Vector2.Zero, 2f,SpriteEffects.None, 0);
 
-        if (PlayerRectangle.X >= PlayerRectangle.Width * 7)
-        {
-            PlayerRectangle.X = 0;
-        } else PlayerRectangle.X += PlayerRectangle.Width;
+        player.Draw(_spriteBatch);
         _spriteBatch.End();
         base.Draw(gameTime);
+    }
+    private void Move()
+    {
+        
     }
 }

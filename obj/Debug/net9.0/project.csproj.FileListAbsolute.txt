@@ -34,3 +34,39 @@ C:\Users\yazan\OneDrive\سطح المكتب\AP Hogeschool\AP-J2\software_enginee
 C:\Users\yazan\OneDrive\سطح المكتب\AP Hogeschool\AP-J2\software_engineering\project\bin\Debug\net9.0\Content\Incubus Sprite Sheet.xnb
 C:\Users\yazan\OneDrive\سطح المكتب\AP Hogeschool\AP-J2\software_engineering\project\obj\Debug\net9.0\project.sourcelink.json
 C:\Users\yazan\OneDrive\سطح المكتب\AP Hogeschool\AP-J2\software_engineering\project\bin\Debug\net9.0\Content\Player_Sprite.xnb
+D:\Yazan\School\AP-TI-J2\software_engineering\project\bin\Debug\net9.0\Content\Incubus Sprite Sheet.xnb
+D:\Yazan\School\AP-TI-J2\software_engineering\project\bin\Debug\net9.0\Content\Player_Sprite.xnb
+D:\Yazan\School\AP-TI-J2\software_engineering\project\bin\Debug\net9.0\project.exe
+D:\Yazan\School\AP-TI-J2\software_engineering\project\bin\Debug\net9.0\project.deps.json
+D:\Yazan\School\AP-TI-J2\software_engineering\project\bin\Debug\net9.0\project.runtimeconfig.json
+D:\Yazan\School\AP-TI-J2\software_engineering\project\bin\Debug\net9.0\project.dll
+D:\Yazan\School\AP-TI-J2\software_engineering\project\bin\Debug\net9.0\project.pdb
+D:\Yazan\School\AP-TI-J2\software_engineering\project\bin\Debug\net9.0\MonoGame.Framework.dll
+D:\Yazan\School\AP-TI-J2\software_engineering\project\bin\Debug\net9.0\NVorbis.dll
+D:\Yazan\School\AP-TI-J2\software_engineering\project\bin\Debug\net9.0\runtimes\android-arm\native\libopenal.so
+D:\Yazan\School\AP-TI-J2\software_engineering\project\bin\Debug\net9.0\runtimes\android-arm64\native\libopenal.so
+D:\Yazan\School\AP-TI-J2\software_engineering\project\bin\Debug\net9.0\runtimes\android-x64\native\libopenal.so
+D:\Yazan\School\AP-TI-J2\software_engineering\project\bin\Debug\net9.0\runtimes\android-x86\native\libopenal.so
+D:\Yazan\School\AP-TI-J2\software_engineering\project\bin\Debug\net9.0\runtimes\ios-arm64\native\libopenal.a
+D:\Yazan\School\AP-TI-J2\software_engineering\project\bin\Debug\net9.0\runtimes\iossimulator-arm64\native\libopenal.a
+D:\Yazan\School\AP-TI-J2\software_engineering\project\bin\Debug\net9.0\runtimes\iossimulator-x64\native\libopenal.a
+D:\Yazan\School\AP-TI-J2\software_engineering\project\bin\Debug\net9.0\runtimes\linux-arm64\native\libopenal.so
+D:\Yazan\School\AP-TI-J2\software_engineering\project\bin\Debug\net9.0\runtimes\linux-x64\native\libopenal.so
+D:\Yazan\School\AP-TI-J2\software_engineering\project\bin\Debug\net9.0\runtimes\osx\native\libopenal.dylib
+D:\Yazan\School\AP-TI-J2\software_engineering\project\bin\Debug\net9.0\runtimes\win-x64\native\openal.dll
+D:\Yazan\School\AP-TI-J2\software_engineering\project\bin\Debug\net9.0\runtimes\linux-x64\native\libSDL2-2.0.so.0
+D:\Yazan\School\AP-TI-J2\software_engineering\project\bin\Debug\net9.0\runtimes\osx\native\libSDL2-2.0.0.dylib
+D:\Yazan\School\AP-TI-J2\software_engineering\project\bin\Debug\net9.0\runtimes\win-x64\native\SDL2.dll
+D:\Yazan\School\AP-TI-J2\software_engineering\project\obj\Debug\net9.0\mgcb.tool.restore
+D:\Yazan\School\AP-TI-J2\software_engineering\project\obj\Debug\net9.0\project.csproj.AssemblyReference.cache
+D:\Yazan\School\AP-TI-J2\software_engineering\project\obj\Debug\net9.0\project.GeneratedMSBuildEditorConfig.editorconfig
+D:\Yazan\School\AP-TI-J2\software_engineering\project\obj\Debug\net9.0\project.AssemblyInfoInputs.cache
+D:\Yazan\School\AP-TI-J2\software_engineering\project\obj\Debug\net9.0\project.AssemblyInfo.cs
+D:\Yazan\School\AP-TI-J2\software_engineering\project\obj\Debug\net9.0\project.csproj.CoreCompileInputs.cache
+D:\Yazan\School\AP-TI-J2\software_engineering\project\obj\Debug\net9.0\project.sourcelink.json
+D:\Yazan\School\AP-TI-J2\software_engineering\project\obj\Debug\net9.0\project.csproj.Up2Date
+D:\Yazan\School\AP-TI-J2\software_engineering\project\obj\Debug\net9.0\project.dll
+D:\Yazan\School\AP-TI-J2\software_engineering\project\obj\Debug\net9.0\refint\project.dll
+D:\Yazan\School\AP-TI-J2\software_engineering\project\obj\Debug\net9.0\project.pdb
+D:\Yazan\School\AP-TI-J2\software_engineering\project\obj\Debug\net9.0\project.genruntimeconfig.cache
+D:\Yazan\School\AP-TI-J2\software_engineering\project\obj\Debug\net9.0\ref\project.dll
