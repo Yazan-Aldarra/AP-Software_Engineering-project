@@ -27,9 +27,10 @@ public class Player : IGameObject
         AddAnimation("standing", 1);
     }
     
-    public void Update()
+    public void Update(GameTime gameTime)
     {
-        animations["standing"].Update();
+        
+        animations["standing"].Update(gameTime);
     }
     public void Draw(SpriteBatch spriteBatch)
     {

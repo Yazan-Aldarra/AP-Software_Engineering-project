@@ -1,11 +1,11 @@
 ﻿
-
 using System.Collections.Generic;
 using System.Data;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+
 
 namespace project;
 
@@ -14,6 +14,7 @@ public class Animation
    public AnimationFrame CurrentFrame {get; set;} 
    private List<AnimationFrame> frames;
    private int counter;
+   private double secondsCounter = 0;
     public Animation()
     {
         frames = new List<AnimationFrame>();
@@ -23,10 +24,17 @@ public class Animation
         frames.Add(frame);
         CurrentFrame = frames[0];
     }
-    public void Update()
+    public void Update(GameTime gameTime)
     {
         CurrentFrame = frames[counter];
-        counter++;
+
+        secondsCounter += gameTime.ElapsedGameTime.TotalSeconds;        
+        int fps = 15;
+        if (secondsCounter >= 1d/fps)
+        {
+            counter++;
+            secondsCounter = 0;
+        }
         if (counter >= frames.Count)
             counter =0;
     }
