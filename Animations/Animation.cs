@@ -1,8 +1,5 @@
 ﻿
 using System.Collections.Generic;
-using System.Data;
-using System.Linq.Expressions;
-using System.Runtime.CompilerServices;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -46,5 +43,10 @@ public class Animation
         {
             AddFrame(new AnimationFrame(new Rectangle(rectangleWidth*i,rectangleHeight*(rowNumToExtract -1) ,rectangleWidth, rectangleHeight)));
         }
+    }
+    public void CropAnimationFrames(int verticalCropping, int horizontalCropping)
+    {
+        foreach (var frame  in frames)
+           frame.CropFrame(verticalCropping, horizontalCropping);
     }
 }

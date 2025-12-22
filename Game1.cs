@@ -1,5 +1,4 @@
-﻿using System.Security;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -14,13 +13,13 @@ public class Game1 : Game
     public Game1()
     {
         _graphics = new GraphicsDeviceManager(this);
+
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
     }
 
     protected override void Initialize()
     {
-
         base.Initialize();
     }
 
@@ -43,7 +42,8 @@ public class Game1 : Game
 
     private void InitializeGameObjects()
     {
-        player = new Player(playerTexture, 8, 5);
+        player = new Player(playerTexture, 8, 5, new KeyboardReader());
+        player.CropAnimationFrames(55, 30);
     }
     protected override void Draw(GameTime gameTime)
     {
@@ -55,9 +55,5 @@ public class Game1 : Game
         player.Draw(_spriteBatch);
         _spriteBatch.End();
         base.Draw(gameTime);
-    }
-    private void Move()
-    {
-        
     }
 }
