@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Runtime.InteropServices;
+using System.Runtime.Intrinsics.Wasm;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -10,6 +12,8 @@ public class Game1 : Game
     private SpriteBatch _spriteBatch;
     private Player player;
     private Texture2D playerTexture;
+    private Texture2D floorText;
+    private Platform floor;
     public Game1()
     {
         _graphics = new GraphicsDeviceManager(this);
@@ -25,6 +29,9 @@ public class Game1 : Game
 
     protected override void LoadContent()
     {
+        floorText = new Texture2D(GraphicsDevice, 1,1);
+        floorText.SetData( new[] { Color.White });
+
         _spriteBatch = new SpriteBatch(GraphicsDevice);
 
         playerTexture = Content.Load<Texture2D>("Player_Sprite");
@@ -42,8 +49,12 @@ public class Game1 : Game
 
     private void InitializeGameObjects()
     {
-        player = new Player(playerTexture, 8, 5, new KeyboardReader());
-        player.CropAnimationFrames(55, 30);
+        player = new Player(playerTexture, 8, 5, new KeyboardReader(), floorText);
+        player.CropAnimationFrames(60, 30);
+
+        var floorRec = new Rectangle(0, 0, GraphicsDevice.Viewport.Width, 10); 
+        floor = new Platform(floorText, floorRec, new Vector2(0, GraphicsDevice.Viewport.Height - floorRec.Height));
+        player.AddColliderTriggers(floor);
     }
     protected override void Draw(GameTime gameTime)
     {
@@ -53,6 +64,8 @@ public class Game1 : Game
         _spriteBatch.Begin();
 
         player.Draw(_spriteBatch);
+        floor.Draw(_spriteBatch);
+
         _spriteBatch.End();
         base.Draw(gameTime);
     }

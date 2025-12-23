@@ -1,4 +1,7 @@
-﻿namespace project;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+
+namespace project;
 
 public class MovementManager
 {
@@ -12,8 +15,6 @@ public class MovementManager
         }
         var distance = direction * movable.Speed;
         var futurePosition = movable.Position + distance;
-
-        
 
         movable.Position = futurePosition;
         movable.Position += distance;

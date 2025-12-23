@@ -18,6 +18,10 @@ public class KeyboardReader : IInputReader
         {
             direction.X += 1;
         }
+        if (state.IsKeyDown(Keys.W))
+        {
+            direction.Y -= 1;
+        }
         return direction;
     }
 }

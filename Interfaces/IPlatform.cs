@@ -2,7 +2,7 @@
 
 namespace project;
 
-public class ovementManager
+public interface IPlatform: ICollider
 {
 
 }

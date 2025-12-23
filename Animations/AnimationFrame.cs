@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-
 namespace project;
 
 public class AnimationFrame
