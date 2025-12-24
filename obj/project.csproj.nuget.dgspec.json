@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\yazan\\School\\ap-ti-j2\\software_engineering\\project\\project.csproj": {}
+    "C:\\Users\\yazan\\OneDrive\\سطح المكتب\\AP Hogeschool\\AP-J2\\software_engineering\\project\\project.csproj": {}
   },
   "projects": {
-    "D:\\yazan\\School\\ap-ti-j2\\software_engineering\\project\\project.csproj": {
+    "C:\\Users\\yazan\\OneDrive\\سطح المكتب\\AP Hogeschool\\AP-J2\\software_engineering\\project\\project.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\yazan\\School\\ap-ti-j2\\software_engineering\\project\\project.csproj",
+        "projectUniqueName": "C:\\Users\\yazan\\OneDrive\\سطح المكتب\\AP Hogeschool\\AP-J2\\software_engineering\\project\\project.csproj",
         "projectName": "project",
-        "projectPath": "D:\\yazan\\School\\ap-ti-j2\\software_engineering\\project\\project.csproj",
+        "projectPath": "C:\\Users\\yazan\\OneDrive\\سطح المكتب\\AP Hogeschool\\AP-J2\\software_engineering\\project\\project.csproj",
         "packagesPath": "C:\\Users\\yazan\\.nuget\\packages\\",
-        "outputPath": "D:\\yazan\\School\\ap-ti-j2\\software_engineering\\project\\obj\\",
+        "outputPath": "C:\\Users\\yazan\\OneDrive\\سطح المكتب\\AP Hogeschool\\AP-J2\\software_engineering\\project\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

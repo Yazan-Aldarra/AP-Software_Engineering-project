@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace project;
 
@@ -8,6 +7,13 @@ public class MovementManager
     public void Move(IMovable movable)
     {
         var direction = movable.InputReader.ReadInput();
+        
+        if (movable is IAnimatable)
+        {
+           var animatable = movable as IAnimatable;
+           animatable.AnimationManager.HandleAnimation(direction);
+        }
+
         if (movable.InputReader.IsDestinationInput)
         {
             direction -= movable.Position;
