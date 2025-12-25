@@ -6,9 +6,12 @@ public class GravityManager
     {
         if (!gravityAffected.IsGrounded)
         {
-            var tmp = gravityAffected.Position;
-            tmp.Y  += 2;
-            gravityAffected.Position = tmp;
+            if (gravityAffected.GravityHoldTimer <= 0)
+            {
+                var tmp = gravityAffected.Position;
+                tmp.Y += 4;
+                gravityAffected.Position = tmp;
+            } else gravityAffected.GravityHoldTimer--;
         }
     }
 }

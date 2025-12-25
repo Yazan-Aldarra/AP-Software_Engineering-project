@@ -1,6 +1,4 @@
-﻿using System.Runtime.InteropServices;
-using System.Runtime.Intrinsics.Wasm;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -49,7 +47,7 @@ public class Game1 : Game
 
     private void InitializeGameObjects()
     {
-        player = new Player(playerTexture, 8, 5, new KeyboardReader(), floorText);
+        player = new Player(playerTexture, 8, 6, new KeyboardReader(), floorText);
         player.CropAnimationFrames(60, 30);
 
         var floorRec = new Rectangle(0, 0, GraphicsDevice.Viewport.Width, 10); 

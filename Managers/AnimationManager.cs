@@ -4,21 +4,29 @@ namespace project;
 public class AnimationManager
 {
     private IAnimatable animatable;
-
     public AnimationManager(IAnimatable animatable)
     {
-       this.animatable = animatable;
+        this.animatable = animatable;
     }
-    public void HandleAnimation() { }
+
+    // public void HandleAnimation(bool IsGrounded)
+    // {
+    //     if (!IsGrounded) { SetCurrentAnimation(AnimationType.FALLING); }
+    // }
     public void HandleAnimation(Vector2 direction)
     {
-        var x = direction.X;
-        var y = direction.Y;
 
-        var res = (x,y) switch {
-            (_, < 0) => AnimationType.RUNNING,
-            (> 0, 0) => AnimationType.RUNNING,
-            (< 0, 0) => AnimationType.RUNNING,
+        var dir = Utils.GetDirection(direction);
+        var res = dir switch
+        {
+            Direction.NONE => AnimationType.STANDING,
+
+            Direction.LEFT or Direction.RIGHT or
+            Direction.UP or Direction.DOWN or
+            Direction.LEFT_TOP or Direction.RIGHT_TOP or
+            Direction.LEFT_DOWN or Direction.RIGHT_DOWN
+                => AnimationType.RUNNING,
+
             _ => AnimationType.STANDING
         };
 
@@ -26,7 +34,6 @@ public class AnimationManager
     }
     public void SetCurrentAnimation(AnimationType animationType)
     {
-        animatable.CurrentAnimation = animationType;
+        // animatable.CurrentAnimation = animationType;
     }
-
 }

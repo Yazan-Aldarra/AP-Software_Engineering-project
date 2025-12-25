@@ -2,10 +2,9 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-
 namespace project;
 
-public enum AnimationType { STANDING, RUNNING, ATTACKING, DYING, FALLING, DAMAGED }
+public enum AnimationType { STANDING, RUNNING, ATTACKING, DYING, IN_AIR, TAKING_DAMAGE }
 public class Animation
 {
     public AnimationFrame CurrentFrame { get; set; }

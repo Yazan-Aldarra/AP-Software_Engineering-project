@@ -5,4 +5,5 @@ public interface IGravityAffected
 {
     public bool IsGrounded { get; set; }
     public Vector2 Position { get; set; }
+    public int GravityHoldTimer { get; set; }
 }
