@@ -25,9 +25,6 @@ public class Player :  IMovableGameObject, IGravityAffected, ICollider, IAnimata
     private Vector2 speed;
     public Vector2 Speed { get => speed; set => speed = value; }
 
-    // MouseState state;
-    // Vector2 mouseVector;
-
     private IInputReader inputReader;
     public IInputReader InputReader { get => inputReader; set => inputReader = value; }
 
@@ -43,9 +40,6 @@ public class Player :  IMovableGameObject, IGravityAffected, ICollider, IAnimata
     private ColliderManager colliderManager;
     private GravityManager gravityManager;
     private Texture2D colliderTexture2d;
-
-    // private AnimationType currentAnimation;
-    // public AnimationType CurrentAnimation { get => currentAnimation; set => currentAnimation = value; }
 
     public int GravityHoldTimer { get; set; }
 
@@ -67,8 +61,6 @@ public class Player :  IMovableGameObject, IGravityAffected, ICollider, IAnimata
         ColliderRec = new Rectangle(0, 0, texture2D.Width / xDrawingsCount, texture2D.Height / yDrawingsCount);
 
         animations = new Dictionary<AnimationType, Animation>();
-
-        // currentAnimation = AnimationType.STANDING;
 
         AddAnimation(AnimationType.STANDING, 1);
         AddAnimation(AnimationType.RUNNING, 2);
@@ -110,9 +102,7 @@ public class Player :  IMovableGameObject, IGravityAffected, ICollider, IAnimata
         else { IsGrounded = false; }
 
 
-        // animationManager.HandleAnimation(IsGrounded);
         gravityManager.Apply(this);
-        // Move();
         FutureDirection =  inputReader.ReadInput();
         State.Update();
        System.Console.WriteLine(State.AnimationType); 
@@ -121,22 +111,12 @@ public class Player :  IMovableGameObject, IGravityAffected, ICollider, IAnimata
     {
         spriteBatch.Draw(colliderTexture2d, ColliderRec, Color.Green);
         spriteBatch.Draw(Texture2D, position, animations[State.AnimationType].CurrentFrame.SourceRectangle, Color.White, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
-
-        // spriteBatch.Draw(Texture2D, position, animations[currentAnimation].CurrentFrame.SourceRectangle, Color.White, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
     }
     public void AddAnimation(AnimationType animationType, int spriteRowNum)
     {
         animations.Add(animationType, new Animation());
         animations[animationType].ExtractAnimationFramesRow(Texture2D, xDrawingsCount, yDrawingsCount, spriteRowNum);
     }
-    // private void Move()
-    // {
-    //     var direction = movementManager.Move(this);
-    //     animationManager.HandleAnimation(direction);
-    //     if (direction.Y < 0)
-    //         GravityHoldTimer = 15;
-    //     System.Console.WriteLine(currentAnimation);
-    // }
     public void CropAnimationFrames(int verticalCropping, int horizontalCropping, List<Animation> animationsNotToCrop = null)
     {
         List<Animation> toCrop = new List<Animation>();

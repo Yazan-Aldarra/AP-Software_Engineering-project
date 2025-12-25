@@ -10,10 +10,6 @@ public class MouseReader : IInputReader
     {
         MouseState state = Mouse.GetState();
         Vector2 directionMouse = new Vector2(state.X, state.Y);
-        // if (directionMouse != Vector2.Zero)
-        // {
-        //     directionMouse.Normalize();
-        // }
         return directionMouse;
     }
 }
