@@ -1,34 +1,65 @@
-﻿using System;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Interfaces;
-using System.Reflection;
 
 namespace project;
 
 public class JumpingState : GameObjectState
 {
-    private int jumpingCount;
-    private int doubleJumpCooldown;
     private float JumpPos;
     private bool IsJumpPosReached = false;
-    public override AnimationType AnimationType { get; } = AnimationType.IN_AIR;
-    public JumpingState(IMovableGameObject gameObject) : base(gameObject)
+    private int doubleJumpCooldown;
+    private Direction previousDirection;
+    public override AnimationType AnimationType => AnimationType.IN_AIR;
+    private IMovable movable;
+    private float doubleJumpSpeed;
+    private float originalJumpSpeed;
+    private bool isDoubleJumpUsed;
+    public JumpingState(IGameObject gameObject) : base(gameObject)
     {
-        JumpPos = gameObject.Position.Y - gameObject.JumpPower;
+        movable = gameObject as IMovable;
+        JumpPos = movable.Position.Y - movable.JumpPower;
+
         Move();
+
+        movable.FutureDirection = Vector2.Zero;
+        doubleJumpCooldown = (int)(movable.JumpingSpeed * 0.75);
+        isDoubleJumpUsed = false;
+
+        originalJumpSpeed = movable.JumpingSpeed;
+        doubleJumpSpeed = originalJumpSpeed * 2;
     }
 
-    public override void Move()
+    public void Move()
     {
-        IsJumpPosReached = gameObject.MovementManager.JumpTill(gameObject, JumpPos);
-        gameObject.MovementManager.MoveInAir(gameObject);
+        IsJumpPosReached = movable.MovementManager.JumpTill(movable, JumpPos);
+        movable.MovementManager.MoveInAir(movable);
     }
 
     public override void Update()
     {
+        var direction = Utils.GetDirection(movable.FutureDirection);
+
         if (IsJumpPosReached)
         {
             gameObject.State = new FallingState(gameObject);
-        } else Move();
+            OnExit();
+            return;
+        }
+
+        if (movable.IsDoubleJumpAvailable && !isDoubleJumpUsed && direction == Direction.UP &&
+                previousDirection != direction && doubleJumpCooldown <= 0)
+        {
+            System.Console.WriteLine("SHOULD COME ONCE");
+            JumpPos = movable.Position.Y - movable.JumpPower * .70f;
+            movable.JumpingSpeed = doubleJumpSpeed;
+
+            isDoubleJumpUsed = true;
+        }
+        else { doubleJumpCooldown--; previousDirection = direction; }
+        Move();
+    }
+    private void OnExit()
+    {
+        movable.JumpingSpeed = originalJumpSpeed;
     }
 }

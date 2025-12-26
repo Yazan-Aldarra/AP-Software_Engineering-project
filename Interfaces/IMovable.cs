@@ -12,4 +12,6 @@ public interface IMovable
     public Vector2 FutureDirection { get; set; }
     public float JumpPower { get; set; }
     public float AirMoveSpeed { get; set; }
+    public bool IsDoubleJumpAvailable { get; set; }
+    public float JumpingSpeed { get; set; }
 }

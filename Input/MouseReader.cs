@@ -6,6 +6,12 @@ namespace project;
 public class MouseReader : IInputReader
 {
     public bool IsDestinationInput => true;
+
+    public AttackType ReadAttack()
+    {
+        throw new System.NotImplementedException();
+    }
+
     public Vector2 ReadInput()
     {
         MouseState state = Mouse.GetState();

@@ -2,8 +2,7 @@
 
 namespace project;
 
-public class TakingDamageState
+public class IEnemy
 {
-
 
 }

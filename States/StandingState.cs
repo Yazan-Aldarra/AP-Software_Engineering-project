@@ -1,39 +1,45 @@
-﻿
+﻿using Interfaces;
+
 namespace project;
 
 public class StandingState : GameObjectState
 {
-    public StandingState(IMovableGameObject gameObject) : base(gameObject) { }
-    public override AnimationType AnimationType { get; } = AnimationType.STANDING;
-    public override void Move() { }
+    private IAttacker attacker;
+    private IMovable movable;
+    public StandingState(IGameObject gameObject) : base(gameObject)
+    {
+        attacker = gameObject as IAttacker;
+        movable = gameObject as IMovable;
+    }
+    public override AnimationType AnimationType { get; } = AnimationType.IDLE;
     public override void Update()
     {
-        var direction = gameObject.FutureDirection;
+        var direction = movable.FutureDirection;
 
         var dir = Utils.GetDirection(direction);
 
-        if (dir == Direction.NONE)
+        if (attacker != null)
         {
-
-        }
-        else
-        {
-            _ = dir switch
+            if (attacker.FutureAttack != AttackType.NONE)
             {
-                Direction.NONE => gameObject.State = this,
-
-                Direction.LEFT or Direction.RIGHT or
-                Direction.DOWN or Direction.LEFT_DOWN or Direction.RIGHT_DOWN
-                    => gameObject.State = new RunningState(gameObject),
-
-                Direction.UP or
-                Direction.LEFT_TOP or Direction.RIGHT_TOP
-                    => gameObject.State = new JumpingState(gameObject),
-
-                _ => gameObject.State = this
-            };
+                gameObject.State = new AttackingState(gameObject);
+                return;
+            }
         }
+        _ = dir switch
+        {
+            Direction.NONE => gameObject.State = this,
 
+            Direction.LEFT or Direction.RIGHT
+                => gameObject.State = new RunningState(gameObject),
 
+            Direction.DOWN
+                => gameObject.State = new CrouchingState(gameObject),
+
+            Direction.UP
+                => gameObject.State = new JumpingState(gameObject),
+
+            _ => gameObject.State = this
+        };
     }
 }

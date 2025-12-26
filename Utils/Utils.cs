@@ -1,10 +1,17 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Security.Cryptography.X509Certificates;
+using Interfaces;
+using Microsoft.Xna.Framework;
 
 namespace project;
 
 public enum Direction { LEFT, UP, RIGHT, DOWN, LEFT_TOP, RIGHT_TOP, RIGHT_DOWN, LEFT_DOWN, NONE }
 public static class Utils
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="direction"></param>
+    /// <returns>8 types of <see cref="Direction"/></returns>
     public static Direction GetDetailedDirection(Vector2 direction)
     {
         var x = direction.X;
@@ -27,6 +34,11 @@ public static class Utils
             _ => Direction.NONE
         };
     }
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="direction"></param>
+    /// <returns>4 types of Directions or Direction.None<see cref="Direction"/></returns>
     public static Direction GetDirection(Vector2 direction)
     {
         var x = direction.X;
@@ -49,6 +61,13 @@ public static class Utils
             _ => Direction.NONE
         };
     }
+    public static Vector2 GetCenteredColliderPosition<T>(T gameObject, Rectangle rectangle) where T : IGameObject, ICollider
+    {
+        var gameObjectPos = gameObject.GetGameObjectPos();
+        var newX = (int)(gameObjectPos.X + rectangle.Width * gameObject.Scale * 0.5 - gameObject.Collider.Width * 0.5);
+        var newY = (int)(gameObjectPos.Y + rectangle.Height * gameObject.Scale * 0.5 - gameObject.Collider.Height * 0.5);
 
+        return new Vector2(newX, newY);
+    }
 }
 

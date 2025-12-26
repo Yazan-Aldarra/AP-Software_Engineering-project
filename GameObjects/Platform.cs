@@ -10,8 +10,8 @@ public class Platform : IGameObject, IPlatform, ICollider
 {
     public Texture2D Texture2D { get; set; }
     public Vector2 Position { get; set; }
-    private Rectangle colliderRec;
-    public Rectangle ColliderRec { get => colliderRec; set => colliderRec = value; }
+    private Rectangle collider;
+    public Rectangle Collider { get => collider; set => collider = value; }
     public float Scale { get; set; }
     public GameObjectState State { get; set; }
     public string Tag { get; set; }
@@ -19,17 +19,27 @@ public class Platform : IGameObject, IPlatform, ICollider
     public Platform(Texture2D texture2D, Rectangle rectangle, Vector2 position)
     {
         this.Texture2D = texture2D;
-        ColliderRec = rectangle;
-        colliderRec.X = (int)position.X;
-        colliderRec.Y = (int)position.Y;
+        Collider = rectangle;
+        collider.X = (int)position.X;
+        collider.Y = (int)position.Y;
     }
     public void Draw(SpriteBatch spriteBatch)
     {
-        spriteBatch.Draw(Texture2D, ColliderRec, Color.Red);
+        spriteBatch.Draw(Texture2D, Collider, Color.Red);
     }
 
     public void Update(GameTime gameTime)
     {
 
+    }
+
+    public Vector2 GetGameObjectPos()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void UpdateColliderPos()
+    {
+        throw new System.NotImplementedException();
     }
 }

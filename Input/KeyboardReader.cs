@@ -22,6 +22,20 @@ public class KeyboardReader : IInputReader
         {
             direction.Y -= 1;
         }
+        if (state.IsKeyDown(Keys.S))
+        {
+            direction.Y += 1;
+        }
+
         return direction;
+    }
+    public AttackType ReadAttack()
+    {
+        KeyboardState state = Keyboard.GetState();
+
+        if (state.IsKeyDown(Keys.Space))
+            return AttackType.BASE;
+
+        else return AttackType.NONE;
     }
 }

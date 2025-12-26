@@ -4,9 +4,10 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace project;
 
-public enum AnimationType { STANDING, RUNNING, ATTACKING, DYING, IN_AIR, TAKING_DAMAGE }
+public enum AnimationType { IDLE, RUNNING, ATTACKING, DYING, IN_AIR, TAKING_DAMAGE, CROUCHING, IS_CROUCHED}
 public class Animation
 {
+    public static readonly int FPS = 15;
     public AnimationFrame CurrentFrame { get; set; }
     private List<AnimationFrame> frames;
     private int counter;
@@ -25,8 +26,7 @@ public class Animation
         CurrentFrame = frames[counter];
 
         secondsCounter += gameTime.ElapsedGameTime.TotalSeconds;
-        int fps = 15;
-        if (secondsCounter >= 1d / fps)
+        if (secondsCounter >= 1d / FPS)
         {
             counter++;
             secondsCounter = 0;
@@ -47,5 +47,10 @@ public class Animation
     {
         foreach (var frame in frames)
             frame.CropFrame(verticalCropping, horizontalCropping);
+    }
+    public void ResetAnimation()
+    {
+        counter = 0;
+        CurrentFrame =  frames[0];
     }
 }

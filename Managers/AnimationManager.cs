@@ -1,39 +1,18 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Collections.Generic;
+using System.Reflection;
+using System.Reflection.Metadata;
+using System.Threading;
+using Microsoft.Xna.Framework;
 namespace project;
 
 public class AnimationManager
 {
-    private IAnimatable animatable;
-    public AnimationManager(IAnimatable animatable)
+    public void HandleResettingAnimation(IAnimatable  animatable, Dictionary<AnimationType, Animation> animations)
     {
-        this.animatable = animatable;
-    }
+        if(animatable.PreviousState == null)
+            return;
 
-    // public void HandleAnimation(bool IsGrounded)
-    // {
-    //     if (!IsGrounded) { SetCurrentAnimation(AnimationType.FALLING); }
-    // }
-    public void HandleAnimation(Vector2 direction)
-    {
-
-        var dir = Utils.GetDirection(direction);
-        var res = dir switch
-        {
-            Direction.NONE => AnimationType.STANDING,
-
-            Direction.LEFT or Direction.RIGHT or
-            Direction.UP or Direction.DOWN or
-            Direction.LEFT_TOP or Direction.RIGHT_TOP or
-            Direction.LEFT_DOWN or Direction.RIGHT_DOWN
-                => AnimationType.RUNNING,
-
-            _ => AnimationType.STANDING
-        };
-
-        SetCurrentAnimation(res);
-    }
-    public void SetCurrentAnimation(AnimationType animationType)
-    {
-        // animatable.CurrentAnimation = animationType;
+        if (animatable.PreviousState != animatable.State)
+            animations[animatable.PreviousState.AnimationType].ResetAnimation();
     }
 }

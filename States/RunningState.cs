@@ -6,30 +6,43 @@ namespace project;
 public class RunningState : GameObjectState
 {
     public override AnimationType AnimationType { get; } = AnimationType.RUNNING;
-    public RunningState(IMovableGameObject gameObject) : base(gameObject)
+    private IMovable movable;
+    private IAttacker attacker;
+    public RunningState(IGameObject gameObject) : base(gameObject)
     {
+        attacker = gameObject as IAttacker;
+        movable = gameObject as IMovable;
         Move();
     }
-    public override void Move()
+    public void Move()
     {
-        gameObject.MovementManager.Move(gameObject);
+        movable.MovementManager.Move(movable);
     }
 
     public override void Update()
     {
 
-        var direction = gameObject.FutureDirection;
+        var direction = movable.FutureDirection;
         var dir = Utils.GetDirection(direction);
 
+        if (attacker != null)
+        {
+            if (attacker.FutureAttack != AttackType.NONE)
+            {
+                gameObject.State = new AttackingState(gameObject);
+                return;
+            }
+        }
         _ = dir switch
         {
             Direction.NONE => gameObject.State = new StandingState(gameObject),
 
-            Direction.LEFT or Direction.RIGHT or Direction.DOWN or
-            Direction.LEFT_DOWN or Direction.RIGHT_DOWN
+            Direction.LEFT or Direction.RIGHT
                 => gameObject.State = this,
 
-            Direction.RIGHT_TOP or Direction.LEFT_TOP or
+            Direction.DOWN
+                => gameObject.State = new CrouchingState(gameObject),
+
             Direction.UP
                 => gameObject.State = new JumpingState(gameObject),
 

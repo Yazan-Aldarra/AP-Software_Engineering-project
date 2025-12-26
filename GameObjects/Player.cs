@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using Interfaces;
 using Microsoft.Xna.Framework;
@@ -6,15 +7,15 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace project;
 
-public class Player :  IMovableGameObject, IGravityAffected, ICollider, IAnimatable
+public class Player : IGameObject, IMovable, IGravityAffected, ICollider, IAnimatable, IAttacker
 {
 
     public Texture2D Texture2D { get; set; }
     private float scale = 3f;
     public float Scale { get => scale; set => scale = value; }
 
-    private Rectangle colliderRec;
-    public Rectangle ColliderRec { get => colliderRec; set => colliderRec = value; }
+    private Rectangle collider;
+    public Rectangle Collider { get => collider; set => collider = value; }
 
     private int xDrawingsCount;
     private int yDrawingsCount;
@@ -27,7 +28,6 @@ public class Player :  IMovableGameObject, IGravityAffected, ICollider, IAnimata
 
     private IInputReader inputReader;
     public IInputReader InputReader { get => inputReader; set => inputReader = value; }
-
     private Dictionary<AnimationType, Animation> animations;
     private MovementManager movementManager;
     public MovementManager MovementManager { get => movementManager; set => movementManager = value; }
@@ -38,16 +38,24 @@ public class Player :  IMovableGameObject, IGravityAffected, ICollider, IAnimata
     public AnimationManager AnimationManager { get => animationManager; set => animationManager = value; }
 
     private ColliderManager colliderManager;
+    public ColliderManager ColliderManager { get => colliderManager; set => colliderManager = value; }
+
     private GravityManager gravityManager;
     private Texture2D colliderTexture2d;
 
     public int GravityHoldTimer { get; set; }
 
-    public GameObjectState State { get; set; } 
+    public GameObjectState State { get; set; }
 
     public Vector2 FutureDirection { get; set; }
     public float JumpPower { get; set; }
     public float AirMoveSpeed { get; set; }
+    public bool IsDoubleJumpAvailable { get; set; }
+    public float JumpingSpeed { get; set; }
+    public float Damage { get; set; }
+    public AttackType FutureAttack { get; set; }
+    public GameObjectState PreviousState { get; set; }
+
     public Player(Texture2D texture2D, int xDrawingsCount, int yDrawingsCount, IInputReader inputReader, Texture2D colliderTexture2d)
     {
         IsGrounded = false;
@@ -58,59 +66,56 @@ public class Player :  IMovableGameObject, IGravityAffected, ICollider, IAnimata
         this.xDrawingsCount = xDrawingsCount;
         this.yDrawingsCount = yDrawingsCount;
 
-        ColliderRec = new Rectangle(0, 0, texture2D.Width / xDrawingsCount, texture2D.Height / yDrawingsCount);
-
         animations = new Dictionary<AnimationType, Animation>();
 
-        AddAnimation(AnimationType.STANDING, 1);
+        AddAnimation(AnimationType.IDLE, 1);
         AddAnimation(AnimationType.RUNNING, 2);
         AddAnimation(AnimationType.ATTACKING, 3);
         AddAnimation(AnimationType.TAKING_DAMAGE, 4);
         AddAnimation(AnimationType.DYING, 5);
         AddAnimation(AnimationType.IN_AIR, 6);
-
+        AddAnimation(AnimationType.CROUCHING, 7);
+        AddAnimation(AnimationType.IS_CROUCHED, 8);
 
         Position = new Vector2(0, 50);
         Speed = new Vector2(10, 0);
-        AirMoveSpeed = Speed.X/2;
-        JumpPower = 150f;
+        AirMoveSpeed = Speed.X / 2;
+        JumpPower = 200f;
+        JumpingSpeed = JumpPower / Animation.FPS;
+        IsDoubleJumpAvailable = true;
 
         this.InputReader = inputReader;
 
         movementManager = new MovementManager();
         gravityManager = new GravityManager();
-        colliderManager = new ColliderManager(this);
-        animationManager = new AnimationManager(this);
+        colliderManager = new ColliderManager();
+        animationManager = new AnimationManager();
 
         State = new FallingState(this);
+
+        var rec = animations[State.AnimationType].CurrentFrame.SourceRectangle;
+        Collider = new Rectangle(0, 0, rec.Width * (int)scale, rec.Height * (int)scale);
     }
 
     public void Update(GameTime gameTime)
     {
-        animations[State.AnimationType].Update(gameTime);
-        colliderRec.X = (int)position.X;
-        colliderRec.Y = (int)position.Y;
+        UpdateColliderPos();
 
-        var colliders = colliderManager.CheckForCollisions();
-        if (colliders.Count > 0)
-        {
-            foreach (var col in colliders)
-            {
-                if (col is IPlatform) { IsGrounded = true; }
-            }
-        }
-        else { IsGrounded = false; }
+        colliderManager.HandleCollisionLogic(this);
+        gravityManager.HandleApplyingGravity(this, State);
+        animationManager.HandleResettingAnimation(this, animations);
 
-
-        gravityManager.Apply(this);
-        FutureDirection =  inputReader.ReadInput();
+        FutureAttack = inputReader.ReadAttack();
+        FutureDirection = inputReader.ReadInput();
         State.Update();
-       System.Console.WriteLine(State.AnimationType); 
+
+        animations[State.AnimationType].Update(gameTime);
+        PreviousState = State;
     }
     public void Draw(SpriteBatch spriteBatch)
     {
-        spriteBatch.Draw(colliderTexture2d, ColliderRec, Color.Green);
         spriteBatch.Draw(Texture2D, position, animations[State.AnimationType].CurrentFrame.SourceRectangle, Color.White, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
+        spriteBatch.Draw(colliderTexture2d, Collider, Color.Green * .5f);
     }
     public void AddAnimation(AnimationType animationType, int spriteRowNum)
     {
@@ -129,10 +134,26 @@ public class Player :  IMovableGameObject, IGravityAffected, ICollider, IAnimata
         }
         else toCrop = animations.Values.ToList();
         toCrop.ForEach(a => a.CropAnimationFrames(verticalCropping, horizontalCropping));
-        ColliderRec = new Rectangle(0, 0, toCrop[0].CurrentFrame.SourceRectangle.Width * (int)scale, toCrop[0].CurrentFrame.SourceRectangle.Height * (int)scale);
     }
     public void AddColliderTriggers(ICollider collider)
     {
         colliderManager.AddCollider(collider);
+    }
+    public void UpdateColliderPos()
+    {
+        var rec = animations[State.AnimationType].CurrentFrame.SourceRectangle;
+        var vector = Utils.GetCenteredColliderPosition(this, rec);
+
+        collider.X = (int)vector.X;
+        collider.Y = (int)vector.Y;
+    }
+    public Vector2 GetGameObjectPos()
+    {
+        return Position;
+    }
+    public void SetColliderSize(int width, int height)
+    {
+        collider.Width = width * (int)scale;
+        collider.Height = height * (int)scale;
     }
 }

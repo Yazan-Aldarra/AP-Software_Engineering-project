@@ -1,26 +1,31 @@
 ﻿using System;
 using System.ComponentModel;
+using Interfaces;
 
 namespace project;
 
 public class FallingState : GameObjectState
 {
     public override AnimationType AnimationType { get; } = AnimationType.IN_AIR;
-    public FallingState(IMovableGameObject gameObject) : base(gameObject)
+    private IMovable movable;
+    public FallingState(IGameObject gameObject) : base(gameObject)
     {
+        movable = gameObject as IMovable;
         Move();
     }
 
-    public override void Move()
+    public void Move()
     {
-        gameObject.MovementManager.MoveInAir(gameObject);
+        movable.MovementManager.MoveInAir(movable);
     }
 
     public override void Update()
     {
-        if (gameObject.IsGrounded)
+
+        if (movable.IsGrounded)
         {
             gameObject.State = new StandingState(gameObject);
-        } else Move();
+        }
+        else Move();
     }
 }

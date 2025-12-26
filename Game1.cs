@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Interfaces;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -27,8 +29,8 @@ public class Game1 : Game
 
     protected override void LoadContent()
     {
-        floorText = new Texture2D(GraphicsDevice, 1,1);
-        floorText.SetData( new[] { Color.White });
+        floorText = new Texture2D(GraphicsDevice, 1, 1);
+        floorText.SetData(new[] { Color.White });
 
         _spriteBatch = new SpriteBatch(GraphicsDevice);
 
@@ -47,10 +49,20 @@ public class Game1 : Game
 
     private void InitializeGameObjects()
     {
-        player = new Player(playerTexture, 8, 6, new KeyboardReader(), floorText);
-        player.CropAnimationFrames(60, 30);
+        player = new Player(playerTexture, 8, 8, new KeyboardReader(), floorText);
+        player.CropAnimationFrames(0, 30);
+        player.SetColliderSize(40, 35);
 
-        var floorRec = new Rectangle(0, 0, GraphicsDevice.Viewport.Width, 10); 
+        BaseWeaponDecorator WeaponDec = new BaseWeaponDecorator(player)
+        {
+            State = null,
+            Scale = 1,
+            Collider = new Rectangle(0, 0, 30, 10),
+            Tag = "rope",
+            Texture2D = floorText
+        };
+
+        var floorRec = new Rectangle(0, 0, GraphicsDevice.Viewport.Width, 10);
         floor = new Platform(floorText, floorRec, new Vector2(0, GraphicsDevice.Viewport.Height - floorRec.Height));
         player.AddColliderTriggers(floor);
     }

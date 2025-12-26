@@ -9,9 +9,15 @@ public class GravityManager
             if (gravityAffected.GravityHoldTimer <= 0)
             {
                 var tmp = gravityAffected.Position;
-                tmp.Y += 4;
+                tmp.Y += 6;
                 gravityAffected.Position = tmp;
-            } else gravityAffected.GravityHoldTimer--;
+            }
+            else gravityAffected.GravityHoldTimer--;
         }
+    }
+    public void HandleApplyingGravity(IGravityAffected gravityAffected, GameObjectState state)
+    {
+        if (!(state is JumpingState))
+            Apply(gravityAffected);
     }
 }
