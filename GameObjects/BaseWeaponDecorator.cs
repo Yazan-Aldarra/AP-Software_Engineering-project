@@ -1,44 +1,43 @@
-﻿using System.Linq;
+﻿using System.Text;
 using Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace project;
 
-public class BaseWeaponDecorator : GameObjectDecorator, ICollider, IAttacker
+public class BaseWeaponDecorator<TGameObject> : EntityDecorator<TGameObject>, IAttack
+    where TGameObject : IGameObject, ICollidable, IMovable
 {
     public float Damage { get; set; }
-    public AttackType FutureAttack { get; set; }
-    public BaseWeaponDecorator(IGameObject gameObject)
-        : base(gameObject)
+    public BaseWeaponDecorator(TGameObject gameObject, Texture2D texture2D)
+        : base(gameObject, texture2D)
     {
         Damage = 5f;
-        FutureAttack = AttackType.BASE;
     }
     public override void Draw(SpriteBatch spriteBatch)
     {
         base.Draw(spriteBatch);
-        spriteBatch.Draw(Texture2D, Collider, Color.Red);
+
+        if (gameObject.State is AttackingState)
+        spriteBatch.Draw(Texture2D, Collider, Color.Red*0.5f);
     }
     public override void Update(GameTime gameTime)
     {
         base.Update(gameTime);
-        UpdateColliderPos();
-        var colliders = ColliderManager.CheckForCollisions(this);
 
-        foreach (var col in colliders)
-        {
-            if (col is IEnemy)
-            {
-                var enemy = col as IHasHealth;
-                enemy.DecreaseHealth(Damage);
-            }
-        }
+        if (!(gameObject.State is AttackingState))
+            return;
+
+        var collisions = CheckForCollisions<TGameObject>(this);
+
+        HandleCollisions(this, collisions);
+        HandleAttackCollisions(this, collisions);
     }
     public override void UpdateColliderPos()
     {
-        var pos = GetGameObjectPos();
-        collider.X = (int)pos.X;
-        collider.X = (int)pos.X;
+        base.UpdateColliderPos();
+
+        collider.Y += gameObject.Collider.Height - collider.Height;
+        collider.X += gameObject.Collider.Width;
     }
 }

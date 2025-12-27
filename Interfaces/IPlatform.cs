@@ -2,7 +2,7 @@
 
 namespace project;
 
-public interface IPlatform: ICollider
+public interface IPlatform : ICollidable
 {
 
 }

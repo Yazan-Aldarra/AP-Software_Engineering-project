@@ -61,11 +61,18 @@ public static class Utils
             _ => Direction.NONE
         };
     }
-    public static Vector2 GetCenteredColliderPosition<T>(T gameObject, Rectangle rectangle) where T : IGameObject, ICollider
+    public static Vector2 GetCenteredColliderPosition<T>(T collider, Rectangle ofRectangle) where T : IGameObject, ICollidable
     {
-        var gameObjectPos = gameObject.GetGameObjectPos();
-        var newX = (int)(gameObjectPos.X + rectangle.Width * gameObject.Scale * 0.5 - gameObject.Collider.Width * 0.5);
-        var newY = (int)(gameObjectPos.Y + rectangle.Height * gameObject.Scale * 0.5 - gameObject.Collider.Height * 0.5);
+        var gameObjectPos = collider.GetGameObjectPos();
+        var newX = (int)(gameObjectPos.X + ofRectangle.Width * collider.Scale * 0.5 - collider.Collider.Width * 0.5);
+        var newY = (int)(gameObjectPos.Y + ofRectangle.Height * collider.Scale * 0.5 - collider.Collider.Height * 0.5);
+
+        return new Vector2(newX, newY);
+    }
+    public static Vector2 GetCenteredColliderPosition(Rectangle collider, Rectangle ofRectangle)
+    {
+        var newX = ofRectangle.X + ofRectangle.Width*.5f - collider.Width*.5f;
+        var newY = ofRectangle.Y + ofRectangle.Height*.5f - collider.Height*.5f;
 
         return new Vector2(newX, newY);
     }

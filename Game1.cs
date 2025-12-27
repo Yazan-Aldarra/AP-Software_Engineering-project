@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -10,10 +11,20 @@ public class Game1 : Game
 {
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
-    private Player player;
+    private IGameObject player;
     private Texture2D playerTexture;
-    private Texture2D floorText;
-    private Platform floor;
+    private Texture2D text;
+    int[,] gameboard = new int[,] {
+        { 1,1,1,1,1,1,1,1 },
+        { 0,0,1,1,0,1,1,1 },
+        { 1,0,0,0,0,0,0,1 },
+        { 1,1,1,1,1,1,0,1 },
+        { 1,0,0,0,0,0,0,2 },
+        { 1,0,1,1,1,1,1,2 },
+        { 1,0,0,0,0,0,0,0 },
+        { 1,1,1,1,1,1,1,1 }
+    };
+    private List<Platform> block =  new List<Platform>();
     public Game1()
     {
         _graphics = new GraphicsDeviceManager(this);
@@ -29,8 +40,8 @@ public class Game1 : Game
 
     protected override void LoadContent()
     {
-        floorText = new Texture2D(GraphicsDevice, 1, 1);
-        floorText.SetData(new[] { Color.White });
+        text = new Texture2D(GraphicsDevice, 1, 1);
+        text.SetData(new[] { Color.White });
 
         _spriteBatch = new SpriteBatch(GraphicsDevice);
 
@@ -49,22 +60,21 @@ public class Game1 : Game
 
     private void InitializeGameObjects()
     {
-        player = new Player(playerTexture, 8, 8, new KeyboardReader(), floorText);
-        player.CropAnimationFrames(0, 30);
-        player.SetColliderSize(40, 35);
+        player = new Player(playerTexture, 8, 8, new KeyboardReader(), text);
+        (player as Player).CropAnimationFrames(0, 30);
+        (player as Player).SetColliderSize(40, 35);
 
-        BaseWeaponDecorator WeaponDec = new BaseWeaponDecorator(player)
-        {
-            State = null,
-            Scale = 1,
-            Collider = new Rectangle(0, 0, 30, 10),
-            Tag = "rope",
-            Texture2D = floorText
-        };
 
-        var floorRec = new Rectangle(0, 0, GraphicsDevice.Viewport.Width, 10);
-        floor = new Platform(floorText, floorRec, new Vector2(0, GraphicsDevice.Viewport.Height - floorRec.Height));
-        player.AddColliderTriggers(floor);
+        block.Add(new Platform(text, new Rectangle(0, 0, GraphicsDevice.Viewport.Width, 10), new Vector2(0, GraphicsDevice.Viewport.Height - 10)));
+        block.Add(new Platform(text, new Rectangle(0, 0, 100, 30), new Vector2 (300, 200)));
+        block.Add(new Platform(text, new Rectangle(0, 0, 100, 100), new Vector2 (400, GraphicsDevice.Viewport.Height - 100 - 10)));
+
+        block.ForEach(b => (player as Player).AddColliderTriggers(b));
+
+        player = new BaseWeaponDecorator<Player>(player as Player, text)
+        { Scale = 3, Texture2D = text };
+
+        player.SetColliderSize(30, 20);
     }
     protected override void Draw(GameTime gameTime)
     {
@@ -74,7 +84,8 @@ public class Game1 : Game
         _spriteBatch.Begin();
 
         player.Draw(_spriteBatch);
-        floor.Draw(_spriteBatch);
+
+        block.ForEach(b => b.Draw(_spriteBatch));
 
         _spriteBatch.End();
         base.Draw(gameTime);

@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace project;
 
 public interface IAttacker
 {
-    public float Damage { get; set; }
     public AttackType FutureAttack { get; set; }
 }

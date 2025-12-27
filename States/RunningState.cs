@@ -12,7 +12,7 @@ public class RunningState : GameObjectState
     {
         attacker = gameObject as IAttacker;
         movable = gameObject as IMovable;
-        Move();
+        Update();
     }
     public void Move()
     {

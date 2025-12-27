@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 
 namespace project;
 
@@ -14,4 +15,6 @@ public interface IMovable
     public float AirMoveSpeed { get; set; }
     public bool IsDoubleJumpAvailable { get; set; }
     public float JumpingSpeed { get; set; }
+    public List<Direction> BlockedSide { get; set; }
+    public void SetOverlappedObjectBack(List<Collision> DecoratorCollisions);
 }

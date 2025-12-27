@@ -1,5 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Interfaces;
+using System.Net;
+using System.Linq.Expressions;
 
 namespace project;
 
@@ -19,7 +21,6 @@ public class JumpingState : GameObjectState
         movable = gameObject as IMovable;
         JumpPos = movable.Position.Y - movable.JumpPower;
 
-        Move();
 
         movable.FutureDirection = Vector2.Zero;
         doubleJumpCooldown = (int)(movable.JumpingSpeed * 0.75);
@@ -27,6 +28,7 @@ public class JumpingState : GameObjectState
 
         originalJumpSpeed = movable.JumpingSpeed;
         doubleJumpSpeed = originalJumpSpeed * 2;
+        Update();
     }
 
     public void Move()
@@ -34,12 +36,11 @@ public class JumpingState : GameObjectState
         IsJumpPosReached = movable.MovementManager.JumpTill(movable, JumpPos);
         movable.MovementManager.MoveInAir(movable);
     }
-
     public override void Update()
     {
         var direction = Utils.GetDirection(movable.FutureDirection);
 
-        if (IsJumpPosReached)
+        if (IsJumpPosReached || (movable.BlockedSide != null && movable.BlockedSide.Contains(Direction.UP)))
         {
             gameObject.State = new FallingState(gameObject);
             OnExit();
@@ -49,13 +50,13 @@ public class JumpingState : GameObjectState
         if (movable.IsDoubleJumpAvailable && !isDoubleJumpUsed && direction == Direction.UP &&
                 previousDirection != direction && doubleJumpCooldown <= 0)
         {
-            System.Console.WriteLine("SHOULD COME ONCE");
             JumpPos = movable.Position.Y - movable.JumpPower * .70f;
             movable.JumpingSpeed = doubleJumpSpeed;
 
             isDoubleJumpUsed = true;
         }
         else { doubleJumpCooldown--; previousDirection = direction; }
+
         Move();
     }
     private void OnExit()

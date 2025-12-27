@@ -1,13 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Runtime.Serialization.Formatters;
+using System.Threading;
 using Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace project;
 
-public class Player : IGameObject, IMovable, IGravityAffected, ICollider, IAnimatable, IAttacker
+public class Player : IGameObject, IMovable, IGravityAffected, ICollidable, IAnimatable, IAttacker
 {
 
     public Texture2D Texture2D { get; set; }
@@ -52,14 +55,15 @@ public class Player : IGameObject, IMovable, IGravityAffected, ICollider, IAnima
     public float AirMoveSpeed { get; set; }
     public bool IsDoubleJumpAvailable { get; set; }
     public float JumpingSpeed { get; set; }
-    public float Damage { get; set; }
     public AttackType FutureAttack { get; set; }
     public GameObjectState PreviousState { get; set; }
-
+    public Rectangle PreviousCollider { get; set; }
+    public List<Direction> BlockedSide { get; set; }
     public Player(Texture2D texture2D, int xDrawingsCount, int yDrawingsCount, IInputReader inputReader, Texture2D colliderTexture2d)
     {
         IsGrounded = false;
         GravityHoldTimer = 3;
+        BlockedSide = new List<Direction>();
         Texture2D = texture2D;
         this.colliderTexture2d = colliderTexture2d;
 
@@ -78,6 +82,8 @@ public class Player : IGameObject, IMovable, IGravityAffected, ICollider, IAnima
         AddAnimation(AnimationType.IS_CROUCHED, 8);
 
         Position = new Vector2(0, 50);
+        PreviousCollider = Collider;
+
         Speed = new Vector2(10, 0);
         AirMoveSpeed = Speed.X / 2;
         JumpPower = 200f;
@@ -99,18 +105,26 @@ public class Player : IGameObject, IMovable, IGravityAffected, ICollider, IAnima
 
     public void Update(GameTime gameTime)
     {
-        UpdateColliderPos();
-
-        colliderManager.HandleCollisionLogic(this);
         gravityManager.HandleApplyingGravity(this, State);
-        animationManager.HandleResettingAnimation(this, animations);
+
+        PreviousCollider = Collider;
 
         FutureAttack = inputReader.ReadAttack();
         FutureDirection = inputReader.ReadInput();
+
+        UpdateColliderPos();
+
+        PreviousState = State;
         State.Update();
+        animationManager.HandleResettingAnimation(this, animations);
 
         animations[State.AnimationType].Update(gameTime);
-        PreviousState = State;
+
+        var collisions = colliderManager.CheckForCollisions<Player>(this);
+
+        colliderManager.HandleCollisions(this, null, collisions);
+        SetOverlappedObjectBack(this, collisions);
+
     }
     public void Draw(SpriteBatch spriteBatch)
     {
@@ -135,7 +149,7 @@ public class Player : IGameObject, IMovable, IGravityAffected, ICollider, IAnima
         else toCrop = animations.Values.ToList();
         toCrop.ForEach(a => a.CropAnimationFrames(verticalCropping, horizontalCropping));
     }
-    public void AddColliderTriggers(ICollider collider)
+    public void AddColliderTriggers(ICollidable collider)
     {
         colliderManager.AddCollider(collider);
     }
@@ -155,5 +169,29 @@ public class Player : IGameObject, IMovable, IGravityAffected, ICollider, IAnima
     {
         collider.Width = width * (int)scale;
         collider.Height = height * (int)scale;
+    }
+    public void HandleCollisions(ICollidable? decorator, List<Collision> colliders)
+    {
+        colliderManager.HandleCollisions(this, decorator, colliders);
+    }
+    public void HandleAttackCollisions<T>(T obj, List<Collision> colliders)
+        where T : ICollidable, IAttack
+    {
+        colliderManager.HandleAttackCollisions(obj, colliders);
+    }
+    public List<Collision> CheckForCollisions<T>(ICollidable collider) where T : IGameObject, ICollidable, IMovable
+    {
+        return colliderManager.CheckForCollisions<T>(collider);
+    }
+
+    public void SetOverlappedObjectBack<T>(T obj, List<Collision> collisions) where T : ICollidable, IMovable
+    {
+        var uniqueCollision = colliderManager.GetHighestCollisions(collisions);
+        movementManager.SetOverlappedObjectBack(obj,uniqueCollision);
+    }
+    public void SetOverlappedObjectBack(List<Collision> DecoratorCollisions)
+    {
+        var uniqueCollision = colliderManager.GetHighestCollisions(DecoratorCollisions);
+        movementManager.SetOverlappedObjectBack(this,uniqueCollision);
     }
 }

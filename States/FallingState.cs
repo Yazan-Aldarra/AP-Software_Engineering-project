@@ -1,6 +1,6 @@
-﻿using System;
-using System.ComponentModel;
+﻿using Microsoft.Xna.Framework;
 using Interfaces;
+using System.Linq.Expressions;
 
 namespace project;
 
@@ -11,7 +11,7 @@ public class FallingState : GameObjectState
     public FallingState(IGameObject gameObject) : base(gameObject)
     {
         movable = gameObject as IMovable;
-        Move();
+        Update();
     }
 
     public void Move()
@@ -25,7 +25,8 @@ public class FallingState : GameObjectState
         if (movable.IsGrounded)
         {
             gameObject.State = new StandingState(gameObject);
+            return;
         }
-        else Move();
+        Move();
     }
 }
