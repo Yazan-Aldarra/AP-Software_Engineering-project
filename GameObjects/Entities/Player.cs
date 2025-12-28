@@ -1,16 +1,15 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Runtime.Serialization.Formatters;
-using System.Threading;
+using System.Net.Http;
 using Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace project;
 
-public class Player : IGameObject, IMovable, IGravityAffected, ICollidable, IAnimatable, IAttacker
+public class Player : IGameObject, IMovable, IGravityAffected, ICollidable, IAnimatable, IAttacker, IHasHealth
 {
 
     public Texture2D Texture2D { get; set; }
@@ -59,6 +58,10 @@ public class Player : IGameObject, IMovable, IGravityAffected, ICollidable, IAni
     public GameObjectState PreviousState { get; set; }
     public Rectangle PreviousCollider { get; set; }
     public List<Direction> BlockedSide { get; set; }
+
+    private float health;
+    public float Health => health;
+
     public Player(Texture2D texture2D, int xDrawingsCount, int yDrawingsCount, IInputReader inputReader, Texture2D colliderTexture2d)
     {
         IsGrounded = false;
@@ -193,5 +196,9 @@ public class Player : IGameObject, IMovable, IGravityAffected, ICollidable, IAni
     {
         var uniqueCollision = colliderManager.GetHighestCollisions(DecoratorCollisions);
         movementManager.SetOverlappedObjectBack(this,uniqueCollision);
+    }
+    public void DecreaseHealth(float value)
+    {
+        health -= value;
     }
 }

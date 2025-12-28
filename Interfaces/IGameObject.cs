@@ -4,7 +4,7 @@ using project;
 
 namespace Interfaces;
 
-public interface IGameObject : ICollidable
+public interface IGameObject
 {
    public void Update(GameTime gameTime);
    public void Draw(SpriteBatch spriteBatch);

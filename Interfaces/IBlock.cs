@@ -2,7 +2,7 @@
 
 namespace project;
 
-public interface IPlatform : ICollidable
+public interface IBlock
 {
 
 }

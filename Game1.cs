@@ -24,7 +24,7 @@ public class Game1 : Game
         { 1,0,0,0,0,0,0,0 },
         { 1,1,1,1,1,1,1,1 }
     };
-    private List<Platform> block =  new List<Platform>();
+    private List<Block> block = new List<Block>();
     public Game1()
     {
         _graphics = new GraphicsDeviceManager(this);
@@ -60,21 +60,21 @@ public class Game1 : Game
 
     private void InitializeGameObjects()
     {
-        player = new Player(playerTexture, 8, 8, new KeyboardReader(), text);
-        (player as Player).CropAnimationFrames(0, 30);
-        (player as Player).SetColliderSize(40, 35);
+        player = new Player2(playerTexture, new KeyboardReader(), 8, 8, text);
+        (player as Player2).CropAnimationFrames(0, 30);
+        (player as Player2).SetColliderSize(40, 35);
 
 
-        block.Add(new Platform(text, new Rectangle(0, 0, GraphicsDevice.Viewport.Width, 10), new Vector2(0, GraphicsDevice.Viewport.Height - 10)));
-        block.Add(new Platform(text, new Rectangle(0, 0, 100, 30), new Vector2 (300, 200)));
-        block.Add(new Platform(text, new Rectangle(0, 0, 100, 100), new Vector2 (400, GraphicsDevice.Viewport.Height - 100 - 10)));
+        block.Add(new SimpleBlock(text, new Rectangle(0, 0, GraphicsDevice.Viewport.Width, 10), new Vector2(0, GraphicsDevice.Viewport.Height - 10)));
+        block.Add(new SimpleBlock(text, new Rectangle(0, 0, 100, 30), new Vector2(300, 200)));
+        block.Add(new SimpleBlock(text, new Rectangle(0, 0, 100, 100), new Vector2(400, GraphicsDevice.Viewport.Height - 100 - 10)));
 
-        block.ForEach(b => (player as Player).AddColliderTriggers(b));
+        block.ForEach(b => (player as Player2).AddColliderTriggers(b));
 
-        player = new BaseWeaponDecorator<Player>(player as Player, text)
+        player = new BaseWeaponDecorator<Player2>(player as Player2, text)
         { Scale = 3, Texture2D = text };
 
-        player.SetColliderSize(30, 20);
+        (player as EntityDecorator<Player2>).SetColliderSize(30,20);
     }
     protected override void Draw(GameTime gameTime)
     {
