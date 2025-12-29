@@ -1,8 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Reflection;
-using System.Reflection.Metadata;
-using System.Threading;
-using Microsoft.Xna.Framework;
 namespace project;
 
 public class AnimationManager

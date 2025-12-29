@@ -5,84 +5,81 @@ using System.Collections.Generic;
 
 namespace project;
 
-public abstract class EntityDecorator<TGameObject> : IGameObject, ICollidable
-    where TGameObject: IGameObject, ICollidable, IMovable
+public abstract class EntityDecorator<TGameObject> : GameObject
+    where TGameObject : Entity
 {
     protected TGameObject gameObject;
 
-    // IGameObject
-    public GameObjectState State { get; set; }
-
-    public Texture2D Texture2D { get; set; }
-    public float Scale { get; set; }
-
-    // ICollidable
-    protected Rectangle collider;
-    public Rectangle PreviousCollider { get; set; }
-    public Rectangle Collider { get => collider; set => collider = value; }
-    public string Tag { get; set; }
     public Vector2 ParentSpeed { get; set; }
 
     public EntityDecorator(TGameObject gameObject, Texture2D texture2D)
+        : base(texture2D)
     {
         this.gameObject = gameObject;
 
         Scale = 3f;
-        collider = new Rectangle(0, 0, 0, 0);
-        PreviousCollider = collider;
+        Collider = new Rectangle(0, 0, 0, 0);
+        PreviousCollider = Collider;
         Tag = "";
-        Texture2D = texture2D;
         ParentSpeed = gameObject.Speed;
     }
-    public virtual void Draw(SpriteBatch spriteBatch)
+    public override void Draw(SpriteBatch spriteBatch)
     {
         gameObject.Draw(spriteBatch);
     }
 
-    public virtual void Update(GameTime gameTime)
+    public override void Update(GameTime gameTime)
     {
         gameObject.Update(gameTime);
 
-        PreviousCollider = collider;
+        PreviousCollider = Collider;
         UpdateColliderPos();
     }
-    public Vector2 GetGameObjectPos()
+    public override Vector2 GetGameObjectPos() => gameObject.GetGameObjectPos();
+
+    protected new virtual void UpdateColliderPos()
     {
-        return gameObject.GetGameObjectPos();
+        var c = Collider;
+        c.X = gameObject.Collider.X;
+        c.Y = gameObject.Collider.Y;
+        Collider = c;
     }
 
-    public virtual void UpdateColliderPos()
+    public new void SetColliderSize(int width, int height)
     {
-        collider.X = gameObject.Collider.X;
-        collider.Y = gameObject.Collider.Y;
+        var c = Collider;
+        c.Width = width * (int)Scale;
+        c.Height = height * (int)Scale;
+        Collider = c;
     }
 
-    public void SetColliderSize(int width, int height)
-    {
-        collider.Width = width * (int)Scale;
-        collider.Height = height * (int)Scale;
-    }
-
-    public void AddColliderTriggers(ICollidable collider)
+    public new void AddColliderTriggers(ICollidable collider)
     {
         gameObject.AddColliderTriggers(collider);
     }
 
-    public void HandleCollisions(ICollidable? decorator, List<Collision> colliders)
+    public new void HandleCollisions(ICollidable? decorator, List<Collision> colliders)
     {
         gameObject.HandleCollisions(decorator, colliders);
     }
-    public void HandleAttackCollisions<T>(T obj, List<Collision> colliders)
+    public new void HandleAttackCollisions<T>(T obj, List<Collision> colliders)
         where T : ICollidable, IAttack
     {
         gameObject.HandleAttackCollisions(obj, colliders);
     }
-    public List<Collision> CheckForCollisions<T>(ICollidable collider) where T : IGameObject, ICollidable, IMovable
+    public new List<Collision> CheckForCollisions<T>(ICollidable collider) where T : GameObject, IMovable
     {
         return gameObject.CheckForCollisions<T>(collider);
     }
-    public void SetOverlappedObjectBack(List<Collision> collisions)
+    public new void SetOverlappedObjectBack(List<Collision> collisions)
     {
         gameObject.SetOverlappedObjectBack(collisions);
+    }
+    public new void UpdateColliderPos(int x, int y)
+    {
+        var c = Collider;
+        c.X = x;
+        c.Y = y;
+        Collider = c;
     }
 }

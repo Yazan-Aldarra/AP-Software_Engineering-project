@@ -2,6 +2,7 @@
 
 public class GravityManager
 {
+    public static float GRAVITY_POWER = 6f;
     public void Apply(IGravityAffected gravityAffected)
     {
         if (!gravityAffected.IsGrounded)
@@ -9,7 +10,7 @@ public class GravityManager
             if (gravityAffected.GravityHoldTimer <= 0)
             {
                 var tmp = gravityAffected.Position;
-                tmp.Y += 6;
+                tmp.Y += GRAVITY_POWER;
                 gravityAffected.Position = tmp;
             }
             else gravityAffected.GravityHoldTimer--;

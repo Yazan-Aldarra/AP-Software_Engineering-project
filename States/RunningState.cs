@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Interfaces;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace project;
 
@@ -8,6 +9,7 @@ public class RunningState : GameObjectState
     public override AnimationType AnimationType { get; } = AnimationType.RUNNING;
     private IMovable movable;
     private IAttacker attacker;
+    private float fallingDelay = Animation.FPS* 1.5f;
     public RunningState(IGameObject gameObject) : base(gameObject)
     {
         attacker = gameObject as IAttacker;
@@ -24,6 +26,16 @@ public class RunningState : GameObjectState
 
         var direction = movable.FutureDirection;
         var dir = Utils.GetDirection(direction);
+
+        if (!movable.IsGrounded && !movable.BlockedSide.Contains(Direction.DOWN))
+        {
+            if (fallingDelay <= 0)
+            {
+                gameObject.State = new FallingState(gameObject);
+                return;
+            }
+            fallingDelay--;
+        }
 
         if (attacker != null)
         {

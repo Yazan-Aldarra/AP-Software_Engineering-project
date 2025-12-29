@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using Interfaces;
 using Microsoft.Xna.Framework;
@@ -10,31 +11,39 @@ public class ColliderManager
 {
     private List<ICollidable> otherColliders = new List<ICollidable>();
     public ColliderManager() { }
-    public List<Collision> CheckForCollisions<T>(ICollidable collider) where T : IGameObject, ICollidable, IMovable
+    public List<Collision> CheckForCollisions<T>(ICollidable collider) where T : IGameObject, IMovable
     {
-        Vector2 Speed;
-        if (collider is IMovable)
-            Speed = (collider as IMovable).Speed;
-        else if (collider is EntityDecorator<T>)
-            Speed = (collider as EntityDecorator<T>).ParentSpeed;
-        else
-            throw new Exception("Not Allowed");
+        // Resolve the collider's current velocity so the hit-side detection can use movement direction
+        // Vector2 velocity = Vector2.Zero;
+        // if (collider is IMovable m)
+        //     velocity = m.Speed;
+        // else if (collider is EntityDecorator<Entity> ed)
+        //     velocity = ed.ParentSpeed;
+        // else
+        //     throw new Exception("Not Allowed");
 
         var tmp = new List<Collision>();
+
         foreach (var otherCol in otherColliders)
         {
+            // Use the velocity-aware hit test to avoid corner ambiguity and tunneling
             var hitSide = GetHitSide(collider.PreviousCollider, collider.Collider, otherCol.Collider);
-            var overlap = GetOverlapVector(collider.Collider, otherCol.Collider);
+            var overlap = GetOverlappedAmount(hitSide, collider.Collider, otherCol.Collider);
 
-            if (hitSide != Direction.NONE && !tmp.Exists(c => c.Collider == otherCol))
+            // Ignore tiny overlaps (like 1px) which are usually due to rounding and cause sticky behavior
+            if (hitSide == Direction.NONE)
+                continue;
+
+            if (!tmp.Exists(c => c.Collider == otherCol))
             {
+                // System.Console.WriteLine("HERE");
                 tmp.Add(new Collision(otherCol, hitSide, overlap));
             }
         }
         return tmp;
     }
     public void HandleCollisions<T>(T parent, ICollidable? decorator, List<Collision> collisions)
-        where T : IGameObject, ICollidable, IMovable
+        where T : GameObject, IMovable
     {
 
         var isForDecorator = decorator == null ? false : true;
@@ -63,6 +72,7 @@ public class ColliderManager
             if (hitSide == Direction.DOWN && !isForDecorator)
             {
                 parent.IsGrounded = true;
+
             }
             else
             {
@@ -97,12 +107,22 @@ public class ColliderManager
     {
         if (!moving.Intersects(solid)) return Direction.NONE; // AABB overlap test [web:2]
 
+        prevMoving = new Rectangle(
+            prevMoving.X,
+            prevMoving.Y,
+            prevMoving.Width,
+            prevMoving.Height
+        );
+
         // If we were not intersecting last frame, we can infer the entry side by where we came from.
-        if (!prevMoving.Intersects(solid)) // Uses Rectangle.Intersects like MonoGame/XNA AABB checks [web:2]
+        if (!prevMoving.Intersects(solid)) 
         {
+            // ignore value otherwise object wil jitter
+            var ignore = 1;
+
+            if (prevMoving.Bottom - ignore <= solid.Top && moving.Bottom + ignore > solid.Top) return Direction.DOWN;
             if (prevMoving.Right <= solid.Left && moving.Right > solid.Left) return Direction.RIGHT;
             if (prevMoving.Left >= solid.Right && moving.Left < solid.Right) return Direction.LEFT;
-            if (prevMoving.Bottom <= solid.Top && moving.Bottom > solid.Top) return Direction.DOWN;
             if (prevMoving.Top >= solid.Bottom && moving.Top < solid.Bottom) return Direction.UP;
         }
 
@@ -119,96 +139,32 @@ public class ColliderManager
             return (overlapLeft < overlapRight) ? Direction.RIGHT : Direction.LEFT;
         else
             return (overlapTop < overlapBottom) ? Direction.DOWN : Direction.UP;
+
     }
 
-    public Vector2 GetOverlapVector(Rectangle moving, Rectangle solid)
+    public float GetOverlappedAmount(Direction hitSide, Rectangle moving, Rectangle solid)
     {
-        // No overlap => no push needed.
-        if (!moving.Intersects(solid))
-            return Vector2.Zero; // Intersects is an AABB overlap check [web:1]
-
-        // Compute penetration depths on each side (positive values if intersecting).
-        int overlapLeft = moving.Right - solid.Left;   // moving penetrated solid from left
-        int overlapRight = solid.Right - moving.Left;  // moving penetrated solid from right
-        int overlapTop = moving.Bottom - solid.Top;    // moving penetrated solid from top
-        int overlapBottom = solid.Bottom - moving.Top;   // moving penetrated solid from bottom
-
-        int minX = Math.Min(overlapLeft, overlapRight);
-        int minY = Math.Min(overlapTop, overlapBottom);
-
-        // Choose axis of minimum penetration (the MTV concept: smallest push-out) [web:7]
-        if (minX < minY)
+        float amount = hitSide switch
         {
-            // Push left or right (note sign: this vector should be ADDED to moving's position).
-            return (overlapLeft < overlapRight)
-                ? new Vector2(-overlapLeft, 0)   // move left
-                : new Vector2(overlapRight, 0);  // move right
-        }
-        else
-        {
-            // Push up or down.
-            return (overlapTop < overlapBottom)
-                ? new Vector2(0, -overlapTop)     // move up
-                : new Vector2(0, overlapBottom);  // move down
-        }
+            Direction.LEFT => solid.Right - moving.Left,   // penetration along -X
+            Direction.RIGHT => moving.Right - solid.Left,   // penetration along +X
+            Direction.UP => solid.Bottom - moving.Top,   // penetration along -Y
+            Direction.DOWN => moving.Bottom - solid.Top,   // penetration along +Y
+            Direction.NONE => 0f,
+            _ => throw new Exception("Not allowed")
+        };
+
+        // Safety: never return negative depth if side inference was wrong.
+        return Math.Max(0f, amount);
     }
     public List<Collision> GetHighestCollisions(List<Collision> collisions)
     {
-        var res = collisions.GroupBy(c => c.Direction).Select(g => g.MaxBy(c => c.OverlapAmount.LengthSquared())).ToList();
+        var res = collisions.GroupBy(c => c.Direction == Direction.DOWN || c.Direction == Direction.UP).Select(g => g.MaxBy(c => c.OverlapAmount)).ToList();
 
-        if (res.Count > 4)
-            throw new Exception("More then 4 elements not allowed");
+        if (res.Count > 2)
+            throw new Exception("More then 2 elements not allowed");
 
         return res;
     }
 
-
-    /// <summary>
-    /// Determines which side of "solid" was hit by "moving".
-    /// Uses previous position and velocity to avoid corner ambiguity and tunneling.
-    /// </summary>
-    public Direction GetHitSide(
-        Rectangle prev,
-        Vector2 velocity,
-        Rectangle moving,
-        Rectangle solid)
-    {
-        // If no collision, early out
-        if (!moving.Intersects(solid))
-            return Direction.NONE;
-
-        // If we entered this frame, determine side by movement direction
-        if (!prev.Intersects(solid))
-        {
-            // Horizontal movement takes priority if dominant
-            if (Math.Abs(velocity.X) > Math.Abs(velocity.Y))
-            {
-                if (velocity.X > 0)
-                    return Direction.RIGHT; // hit solid from left
-                else if (velocity.X < 0)
-                    return Direction.LEFT;
-            }
-            else
-            {
-                if (velocity.Y > 0)
-                    return Direction.DOWN; // hit solid from top
-                else if (velocity.Y < 0)
-                    return Direction.UP;
-            }
-        }
-
-        // --- Stable fallback: minimum translation vector ---
-        float overlapLeft = moving.Right - solid.Left;
-        float overlapRight = solid.Right - moving.Left;
-        float overlapTop = moving.Bottom - solid.Top;
-        float overlapBottom = solid.Bottom - moving.Top;
-
-        float minX = Math.Min(overlapLeft, overlapRight);
-        float minY = Math.Min(overlapTop, overlapBottom);
-
-        if (minX < minY)
-            return overlapLeft < overlapRight ? Direction.RIGHT : Direction.LEFT;
-        else
-            return overlapTop < overlapBottom ? Direction.DOWN : Direction.UP;
-    }
 }

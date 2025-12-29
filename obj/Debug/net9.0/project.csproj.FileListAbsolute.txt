@@ -70,3 +70,9 @@ D:\Yazan\School\AP-TI-J2\software_engineering\project\obj\Debug\net9.0\refint\pr
 D:\Yazan\School\AP-TI-J2\software_engineering\project\obj\Debug\net9.0\project.pdb
 D:\Yazan\School\AP-TI-J2\software_engineering\project\obj\Debug\net9.0\project.genruntimeconfig.cache
 D:\Yazan\School\AP-TI-J2\software_engineering\project\obj\Debug\net9.0\ref\project.dll
+D:\yazan\School\ap-ti-j2\software_engineering\project\bin\Debug\net9.0\Content\blocks\Tile_01.xnb
+D:\yazan\School\ap-ti-j2\software_engineering\project\bin\Debug\net9.0\Content\blocks\Tile_02.xnb
+D:\yazan\School\ap-ti-j2\software_engineering\project\bin\Debug\net9.0\Content\blocks\Tile_03.xnb
+D:\yazan\School\ap-ti-j2\software_engineering\project\bin\Debug\net9.0\Content\blocks\Tile_04.xnb
+D:\yazan\School\ap-ti-j2\software_engineering\project\bin\Debug\net9.0\Content\blocks\Tile_05.xnb
+D:\yazan\School\ap-ti-j2\software_engineering\project\bin\Debug\net9.0\Content\blocks\Tile_06.xnb

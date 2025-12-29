@@ -40,7 +40,7 @@ public abstract class GameObject : IGameObject, ICollidable, IAnimatable
     public GameObjectState PreviousState { get; set; }
 
     // Constructor provides common initialization used by derived objects (like Player)
-    protected GameObject(Texture2D texture2D, int xDrawingsCount = 1, int yDrawingsCount = 1, Texture2D colliderTexture2d = null)
+    protected GameObject(Texture2D texture2D, Vector2? initialPos = null, int width = 10, int height = 10, float scale = 1f, Animation animation = null, int xDrawingsCount = 1, int yDrawingsCount = 1, Texture2D colliderTexture2d = null)
     {
         Texture2D = texture2D;
         this.xDrawingsCount = xDrawingsCount;
@@ -51,17 +51,19 @@ public abstract class GameObject : IGameObject, ICollidable, IAnimatable
         animationManager = new AnimationManager();
         colliderManager = new ColliderManager();
 
-        position = Vector2.Zero;
-        Scale = 1f;
+        position = initialPos ?? Vector2.Zero;
+        Scale = scale;
 
-        // initialize a default collider size from the sprite sheet cell if available
-        if (Texture2D != null && xDrawingsCount > 0 && yDrawingsCount > 0)
-        {
-            int singleW = Texture2D.Width / xDrawingsCount;
-            int singleH = Texture2D.Height / yDrawingsCount;
-            Collider = new Rectangle(0, 0, singleW * (int)Scale, singleH * (int)Scale);
-            PreviousCollider = Collider;
-        }
+        // if a single animation object is provided, register it as IDLE by default
+        if (animation != null)
+            animations[AnimationType.IDLE] = animation;
+
+        // initialize a default collider size from provided width/height
+        Collider = new Rectangle((int)position.X, (int)position.Y, width * (int)Scale, height * (int)Scale);
+        PreviousCollider = Collider;
+
+        // if (animation == null)
+        //     animations.Add(AnimationType.IDLE, new Animation(new AnimationFrame(Collider)));
     }
 
     // IGameObject.Update - base handles animation updates and resetting when state changes
@@ -87,9 +89,9 @@ public abstract class GameObject : IGameObject, ICollidable, IAnimatable
             var src = animations[State.AnimationType].CurrentFrame.SourceRectangle;
             spriteBatch.Draw(Texture2D, position, src, Color.White, 0f, Vector2.Zero, Scale, SpriteEffects.None, 0f);
         }
-        else if (Texture2D != null)
+        else if (Texture2D != null && animations.ContainsKey(AnimationType.IDLE))
         {
-            spriteBatch.Draw(Texture2D, position, Color.White);
+            spriteBatch.Draw(Texture2D, position, animations[AnimationType.IDLE].CurrentFrame.SourceRectangle, Color.White, 0f, Vector2.Zero, Scale, SpriteEffects.None, 0f);
         }
         if (colliderTexture2d != null)
             spriteBatch.Draw(colliderTexture2d, Collider, Color.Green * .5f);
@@ -121,7 +123,7 @@ public abstract class GameObject : IGameObject, ICollidable, IAnimatable
         colliderManager.AddCollider(collider);
     }
 
-    public List<Collision> CheckForCollisions<T>(ICollidable collider) where T : IGameObject, ICollidable, IMovable
+    public List<Collision> CheckForCollisions<T>(ICollidable collider) where T : GameObject, IMovable
     {
         return colliderManager.CheckForCollisions<T>(collider);
     }
@@ -148,7 +150,7 @@ public abstract class GameObject : IGameObject, ICollidable, IAnimatable
         collider.Height = height * (int)Scale;
     }
 
-    public void UpdateColliderPos()
+    protected void UpdateColliderPos()
     {
         if (State != null && animations.ContainsKey(State.AnimationType))
         {
@@ -163,5 +165,12 @@ public abstract class GameObject : IGameObject, ICollidable, IAnimatable
             collider.X = (int)position.X;
             collider.Y = (int)position.Y;
         }
+    }
+    public void UpdateColliderPos(int x, int y)
+    {
+        collider.X = x;
+        collider.Y = y;
+        position.X = x;
+        position.Y = y;
     }
 }

@@ -10,10 +10,10 @@ public interface ICollidable
     public Rectangle Collider { get; set; }
     public Rectangle PreviousCollider { get; set; }
     public string Tag { get; set; }
-    public void UpdateColliderPos();
+    public void UpdateColliderPos(int x, int y);
     public void SetColliderSize(int width, int height);
     public void AddColliderTriggers(ICollidable collider);
-    public List<Collision> CheckForCollisions<T>(ICollidable collider) where T : IGameObject, ICollidable, IMovable;
+    public List<Collision> CheckForCollisions<T>(ICollidable collider) where T : GameObject, IMovable;
     public void HandleCollisions(ICollidable? decorator, List<Collision> colliders);
     public void HandleAttackCollisions<T>(T obj, List<Collision> colliders)
         where T : ICollidable, IAttack;

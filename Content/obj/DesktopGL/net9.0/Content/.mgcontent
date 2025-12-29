@@ -4,9 +4,21 @@
   <Platform>DesktopGL</Platform>
   <Config />
   <SourceFiles>
+    <File>D:/yazan/School/ap-ti-j2/software_engineering/project/Content/blocks/Tile_01.png</File>
+    <File>D:/yazan/School/ap-ti-j2/software_engineering/project/Content/blocks/Tile_02.png</File>
+    <File>D:/yazan/School/ap-ti-j2/software_engineering/project/Content/blocks/Tile_03.png</File>
+    <File>D:/yazan/School/ap-ti-j2/software_engineering/project/Content/blocks/Tile_04.png</File>
+    <File>D:/yazan/School/ap-ti-j2/software_engineering/project/Content/blocks/Tile_05.png</File>
+    <File>D:/yazan/School/ap-ti-j2/software_engineering/project/Content/blocks/Tile_06.png</File>
     <File>D:/yazan/School/ap-ti-j2/software_engineering/project/Content/Player_Sprite.png</File>
   </SourceFiles>
   <DestFiles>
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
     <File xsi:nil="true" />
   </DestFiles>
 </SourceFileCollection>

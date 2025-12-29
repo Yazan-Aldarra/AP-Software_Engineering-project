@@ -6,9 +6,9 @@ public class Collision
 {
     public ICollidable Collider { get; }
     public Direction Direction { get; }
-    public Vector2 OverlapAmount { get; }
+    public float OverlapAmount { get; }
 
-    public Collision(ICollidable collider, Direction direction, Vector2 overlapAmount)
+    public Collision(ICollidable collider, Direction direction, float overlapAmount)
     {
         Collider = collider;
         Direction = direction;

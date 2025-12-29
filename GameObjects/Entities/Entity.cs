@@ -23,20 +23,21 @@ public abstract class Entity : GameObject, IMovable
     public float JumpingSpeed { get; set; }
     public List<Direction> BlockedSide { get; set; }
 
-    protected Entity(Texture2D texture2D, IInputReader inputReader, int xDrawingsCount = 5, int yDrawingsCount = 5 , Texture2D colliderTexture2d = null)
-        : base(texture2D, xDrawingsCount, yDrawingsCount, colliderTexture2d)
+    // New convenience constructor matching the GameObject default signature
+    protected Entity(Texture2D texture2D, IInputReader inputReader, Vector2? initialPos = null, int width = 10, int height = 10, float scale = 1f, Animation animation = null, int xDrawingsCount = 5, int yDrawingsCount = 5, Texture2D colliderTexture2d = null)
+        : base(texture2D, initialPos, width, height, scale, animation, xDrawingsCount, yDrawingsCount, colliderTexture2d)
     {
         // defaults similar to player2
-        Scale = 3f;
         BlockedSide = new List<Direction>();
-        Speed = new Vector2(10, 0);
-        AirMoveSpeed = Speed.X / 2;
+        Speed = new Vector2(5, 0);
+        AirMoveSpeed = Speed.X * .5f;
         JumpPower = 200f;
         JumpingSpeed = JumpPower / Animation.FPS;
         IsDoubleJumpAvailable = true;
 
         InputReader = inputReader;
 
+        // InputReader remains null unless caller provides it explicitly via property
         MovementManager = new MovementManager();
 
         State = new StandingState(this);
@@ -53,9 +54,14 @@ public abstract class Entity : GameObject, IMovable
         PreviousState = State;
         State.Update();
 
+        // Sync collider to the new position after movement so collision checks use current frame rect
+        UpdateColliderPos();
+
         var collisions = colliderManager.CheckForCollisions<Entity>(this);
-        colliderManager.HandleCollisions(this, null, collisions);
-        SetOverlappedObjectBack(this, collisions);
+        var tmp = colliderManager.GetHighestCollisions(collisions);
+        colliderManager.HandleCollisions(this, null, tmp);
+
+        SetOverlappedObjectBack(this, tmp);
     }
 
     public override void Draw(SpriteBatch spriteBatch)

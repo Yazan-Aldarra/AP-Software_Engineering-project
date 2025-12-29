@@ -1,4 +1,5 @@
-﻿using Interfaces;
+﻿using System;
+using Interfaces;
 
 namespace project;
 
@@ -18,6 +19,11 @@ public class StandingState : GameObjectState
 
         var dir = Utils.GetDirection(direction);
 
+        if (!movable.IsGrounded && !movable.BlockedSide.Contains(Direction.DOWN))
+        {
+            gameObject.State = new FallingState(gameObject);
+            return;
+        }
         if (attacker != null)
         {
             if (attacker.FutureAttack != AttackType.NONE)

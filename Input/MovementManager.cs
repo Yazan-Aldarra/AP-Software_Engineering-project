@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -66,10 +68,26 @@ public class MovementManager
     }
     public void SetOverlappedObjectBack<T>(T movable, List<Collision> collisions) where T : IMovable, ICollidable
     {
-        var collision = collisions.Find(c => c.Direction == Direction.LEFT || c.Direction == Direction.RIGHT);
-        if (collision == null)
-            return;
+        var horCol = collisions
+               .Where(c => c.Direction == Direction.LEFT || c.Direction == Direction.RIGHT)
+               .OrderBy(c => c.OverlapAmount)
+               .FirstOrDefault();
 
-        movable.Position += collision.OverlapAmount;
+        var verCol = collisions
+            .Where(c => c.Direction == Direction.UP || c.Direction == Direction.DOWN)
+            .OrderBy(c => c.OverlapAmount)
+            .FirstOrDefault();
+
+        float dx = 0f;
+        float dy = 0f;
+
+        if (horCol != null)
+            dx = (horCol.Direction == Direction.LEFT) ? +horCol.OverlapAmount : -horCol.OverlapAmount;
+
+        if (verCol != null)
+            // dy = (verCol.Direction == Direction.UP) ? +verCol.OverlapAmount : -verCol.OverlapAmount;
+            dy = (verCol.Direction == Direction.UP) ? +verCol.OverlapAmount : -verCol.OverlapAmount + 1;
+
+        movable.Position = new Vector2(movable.Position.X + dx, movable.Position.Y + dy);
     }
 }

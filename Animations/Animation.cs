@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -12,9 +13,11 @@ public class Animation
     private List<AnimationFrame> frames;
     private int counter;
     private double secondsCounter = 0;
-    public Animation()
+    public Animation(AnimationFrame frame = null)
     {
         frames = new List<AnimationFrame>();
+        if (frame != null)
+            AddFrame(frame);
     }
     public void AddFrame(AnimationFrame frame)
     {
