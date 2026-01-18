@@ -37,7 +37,7 @@ public abstract class EntityDecorator<TGameObject> : GameObject
     }
     public override Vector2 GetGameObjectPos() => gameObject.GetGameObjectPos();
 
-    protected new virtual void UpdateColliderPos()
+    protected override void UpdateColliderPos()
     {
         var c = Collider;
         c.X = gameObject.Collider.X;
@@ -45,7 +45,7 @@ public abstract class EntityDecorator<TGameObject> : GameObject
         Collider = c;
     }
 
-    public new void SetColliderSize(int width, int height)
+    public override void SetColliderSize(int width, int height)
     {
         var c = Collider;
         c.Width = width * (int)Scale;
@@ -53,29 +53,24 @@ public abstract class EntityDecorator<TGameObject> : GameObject
         Collider = c;
     }
 
-    public new void AddColliderTriggers(ICollidable collider)
+    public override void AddColliderTriggers(ICollidable collider)
     {
         gameObject.AddColliderTriggers(collider);
     }
 
-    public new void HandleCollisions(ICollidable? decorator, List<Collision> colliders)
+    public override void HandleCollisions(ICollidable? decorator, List<Collision> colliders)
     {
         gameObject.HandleCollisions(decorator, colliders);
     }
-    public new void HandleAttackCollisions<T>(T obj, List<Collision> colliders)
-        where T : ICollidable, IAttack
-    {
-        gameObject.HandleAttackCollisions(obj, colliders);
-    }
-    public new List<Collision> CheckForCollisions<T>(ICollidable collider) where T : GameObject, IMovable
+    public override List<Collision> CheckForCollisions<T>(ICollidable collider) 
     {
         return gameObject.CheckForCollisions<T>(collider);
     }
-    public new void SetOverlappedObjectBack(List<Collision> collisions)
+    public void SetOverlappedObjectBack(List<Collision> collisions)
     {
         gameObject.SetOverlappedObjectBack(collisions);
     }
-    public new void UpdateColliderPos(int x, int y)
+    public override void UpdateColliderPos(int x, int y)
     {
         var c = Collider;
         c.X = x;

@@ -2,7 +2,7 @@
 
 public class GravityManager
 {
-    public static float GRAVITY_POWER = 6f;
+    public static float GRAVITY_POWER = 7f;
     public void Apply(IGravityAffected gravityAffected)
     {
         if (!gravityAffected.IsGrounded)

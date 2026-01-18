@@ -17,7 +17,15 @@ public abstract class Entity : GameObject, IMovable
     public bool IsGrounded { get; set; }
 
     public Vector2 FutureDirection { get; set; }
-    public float JumpPower { get; set; }
+    public float jumpPower;
+    public float JumpPower
+    {
+        get => jumpPower; set
+        {
+            jumpPower = value;
+            JumpingSpeed = jumpPower / Animation.FPS;
+        }
+    }
     public float AirMoveSpeed { get; set; }
     public bool IsDoubleJumpAvailable { get; set; }
     public float JumpingSpeed { get; set; }
@@ -31,7 +39,7 @@ public abstract class Entity : GameObject, IMovable
         BlockedSide = new List<Direction>();
         Speed = new Vector2(5, 0);
         AirMoveSpeed = Speed.X * .5f;
-        JumpPower = 200f;
+        JumpPower = 100f;
         JumpingSpeed = JumpPower / Animation.FPS;
         IsDoubleJumpAvailable = true;
 
@@ -56,12 +64,6 @@ public abstract class Entity : GameObject, IMovable
 
         // Sync collider to the new position after movement so collision checks use current frame rect
         UpdateColliderPos();
-
-        var collisions = colliderManager.CheckForCollisions<Entity>(this);
-        var tmp = colliderManager.GetHighestCollisions(collisions);
-        colliderManager.HandleCollisions(this, null, tmp);
-
-        SetOverlappedObjectBack(this, tmp);
     }
 
     public override void Draw(SpriteBatch spriteBatch)

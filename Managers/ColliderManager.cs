@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Runtime.Serialization;
 using Interfaces;
 using Microsoft.Xna.Framework;
 
@@ -13,15 +14,6 @@ public class ColliderManager
     public ColliderManager() { }
     public List<Collision> CheckForCollisions<T>(ICollidable collider) where T : IGameObject, IMovable
     {
-        // Resolve the collider's current velocity so the hit-side detection can use movement direction
-        // Vector2 velocity = Vector2.Zero;
-        // if (collider is IMovable m)
-        //     velocity = m.Speed;
-        // else if (collider is EntityDecorator<Entity> ed)
-        //     velocity = ed.ParentSpeed;
-        // else
-        //     throw new Exception("Not Allowed");
-
         var tmp = new List<Collision>();
 
         foreach (var otherCol in otherColliders)
@@ -36,7 +28,6 @@ public class ColliderManager
 
             if (!tmp.Exists(c => c.Collider == otherCol))
             {
-                // System.Console.WriteLine("HERE");
                 tmp.Add(new Collision(otherCol, hitSide, overlap));
             }
         }
@@ -66,13 +57,12 @@ public class ColliderManager
             var collider = collision.Collider;
             var hitSide = collision.Direction;
 
-            if (collider is IAttack)
+            if (collider is IAttack && !(collider is IAttacker))
                 continue;
 
             if (hitSide == Direction.DOWN && !isForDecorator)
             {
                 parent.IsGrounded = true;
-
             }
             else
             {
@@ -81,16 +71,15 @@ public class ColliderManager
             }
         }
     }
-    public void HandleAttackCollisions<T>(T obj, List<Collision> collisions)
-        where T : ICollidable, IAttack
+    // Handles in coming attacks 
+    public void HandleInComingAttack<T>(T obj, List<Collision> collisions)
+        where T : ICollidable, IHasHealth
     {
         foreach (var col in collisions)
         {
-            var collider = col.Collider;
-            if (collider is IHasHealth)
+            if (col.Collider is IAttack attack)
             {
-                var hasHealth = collider as IHasHealth;
-                hasHealth.DecreaseHealth(obj.Damage);
+                obj.DecreaseHealth(attack.Damage);
             }
         }
     }
@@ -139,7 +128,6 @@ public class ColliderManager
             return (overlapLeft < overlapRight) ? Direction.RIGHT : Direction.LEFT;
         else
             return (overlapTop < overlapBottom) ? Direction.DOWN : Direction.UP;
-
     }
 
     public float GetOverlappedAmount(Direction hitSide, Rectangle moving, Rectangle solid)

@@ -21,7 +21,6 @@ public class JumpingState : GameObjectState
         movable = gameObject as IMovable;
         JumpPos = movable.Position.Y - movable.JumpPower;
 
-
         movable.FutureDirection = Vector2.Zero;
         doubleJumpCooldown = (int)(movable.JumpingSpeed * 0.75);
         isDoubleJumpUsed = false;

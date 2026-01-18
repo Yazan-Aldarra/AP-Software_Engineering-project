@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Net.Security;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using Interfaces;
 using Microsoft.Xna.Framework;
@@ -10,16 +13,6 @@ using project;
 
 public class Map
 {
-    // int[,] gameboard = new int[,] {
-    //     { 1,1,1,1,1,1,1,1 },
-    //     { 0,0,1,1,0,1,1,1 },
-    //     { 1,0,0,0,0,0,0,1 },
-    //     { 1,1,1,1,1,1,0,1 },
-    //     { 1,0,0,0,0,0,0,2 },
-    //     { 1,0,1,1,1,1,1,2 },
-    //     { 1,0,0,0,0,0,0,0 },
-    //     { 1,1,1,1,1,1,1,1 }
-    // };
     int trap = 0;
     int[,] gameboard;
     private readonly Point mapBlockSize;
@@ -31,48 +24,58 @@ public class Map
 
     public Map(ContentManager content, GraphicsDevice graphicsDevice, Texture2D emptyText = null)
     {
+
+        // 0 = void, 1 = solid, 2 = trap
         gameboard = new int[,] {
-            // 0 = void, 1 = solid, trap = trap
-            {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,1,1,0,1,1,0,1,1,0,1,1,0,1,1,0,1},
-            {1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,1},
-            {1,1,0,1,1,0,1,1,0,1,1,0,1,1,0,1,1,1},
 
-            // Main traversal lane (never more than 2 blocks high)
-            {0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0},
-            {0,1,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0},
-            {0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0},
+            // Sky (3 rows)
+            {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+            {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+            {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
 
-            // Trap corridor (reachable path)
-            {0,0,1,trap,1,0,1,trap,1,0,1,trap,1,0,1,trap,1,0},
-            {0,0,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0},
+            // Main (7 rows) - platforms + traps + gaps
+            // Row 3: a long upper platform with holes to force timing/route choice
+            {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,1,1,1,0,0,1,1,1,1,0,0,1,1,1,0,0,1,1,1,1,0,0,1,1,1,0,0,1,},
 
-            // Upper route with safe steps
-            {0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,0},
-            {0,0,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0},
+            // Row 4: stepping stones / “islands”
+            {0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,1,1,0,0,0,1,1,0,0,0,1,1,0,0,0,0,1,1,0,0,0,1,1,0,0,0,1,1,0,},
 
-            // Final approach
-            {0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0},
-            {0,0,0,0,1,1,1,0,1,1,1,0,1,1,1,0,1,0},
+            // Row 5: mid-height supports that let skilled players keep speed
+            {0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,1,1,0,0,0,1,1,0,0,0,1,1,0,0,0,1,1,0,0,0,1,1,0,0,0,1,1,0,0,0,1,1,},
 
-            // Void fall
-            {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-            {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+            // Row 6: early ramp/ledge + a safer “high road” start
+            {1,1,2,1,0,1,0,0,1,0,1,1,0,0,0,1,1,1,0,0,0,0,1,1,1,0,0,0,1,1,1,0,0,0,1,1,1,0,0,0,1,1,1,0,0,0,1,1,1,0,},
+
+            // Row 7: trap pits under common landing zones (punish “drop straight down”)
+            {0,0,0,0,0,0,0,0,0,0,2,2,2,0,0,0,2,2,2,0,0,0,2,2,2,0,0,0,2,2,2,0,0,0,2,2,2,0,0,0,2,2,2,0,0,0,2,2,2,0,},
+
+            // Row 8: mostly empty to create fall-threat, but a few rescue ledges
+            {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,1,1,1,},
+
+            // Row 9: ground with gaps + trap-lined “death lanes”
+            {1,1,1,1,1,0,0,0,1,1,1,1,1,0,0,0,1,1,1,1,1,0,0,0,1,1,1,1,1,0,0,0,1,1,1,1,1,0,0,0,1,1,1,1,1,0,0,0,1,1,},
+
+            // Void fall (3 rows)
+            {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+            // {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+            // {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
         };
 
-        mapBlockSize = new(gameboard.GetLength(0), gameboard.GetLength(1));
+        mapBlockSize = new Point(gameboard.GetLength(1), gameboard.GetLength(0));
         this.emptyText = emptyText;
 
-        blocks = new Block[mapBlockSize.X, mapBlockSize.Y];
+        blocks = new Block[mapBlockSize.Y, mapBlockSize.X];
 
-        List<Texture2D> textures = new(5);
-        for (int i = 1; i < 6; i++) textures.Add(content.Load<Texture2D>($"blocks\\Tile_0{i}"));
+        var textures = new Dictionary<BlockType, List<Texture2D>>();
+        textures.Add(BlockType.SIMPLE, new List<Texture2D>());
+        textures.Add(BlockType.TRAP, new List<Texture2D>());
 
+        for (int i = 1; i <= 2; i++)
+            textures[BlockType.SIMPLE].Add(content.Load<Texture2D>($"blocks\\Tile_0{i}"));
 
+        textures[BlockType.TRAP].Add(content.Load<Texture2D>($"blocks\\Trap_Tile_01"));
 
-        // CreateBlocks(textures, new List<BlockType> { BlockType.SIMPLE });
-        CreateBlocks(textures, new List<BlockType> { BlockType.SIMPLE });
+        CreateBlocks(textures, emptyText);
         CreateMapBoundaries(graphicsDevice);
     }
 
@@ -82,53 +85,58 @@ public class Map
             return;
         for (int y = 0; y < mapBlockSize.Y; y++)
         {
-            for (int x = 0; x < mapBlockSize.X; x++) blocks[x, y]?.Draw(spriteBatch);
+            for (int x = 0; x < mapBlockSize.X; x++) blocks[y, x]?.Draw(spriteBatch);
         }
     }
     public void Update(GameTime gameTime, GraphicsDevice graphicsDevice)
     {
-        UpdateBoundaries();
+        foreach (var block in blocks)
+        {
+            if (block != null)
+                block.Update(gameTime);
+        }
     }
-
-    private void CreateBlocks(List<Texture2D> textures, List<BlockType> blockTypes, Texture2D text = null)
+    private void CreateBlocks(Dictionary<BlockType, List<Texture2D>> textures, Texture2D text = null)
     {
-        var size = 100;
-        var scale = 3f;
 
-        Random random = new();
+        var scale = 1f;
+        var random = new Random();
 
-        BlockSize = new(textures[0].Width, textures[0].Height);
-        MapSize = new(BlockSize.X * mapBlockSize.X * (int)scale, BlockSize.Y * mapBlockSize.Y * (int)scale);
+        BlockSize = new Point(textures[BlockType.SIMPLE][0].Width, textures[BlockType.SIMPLE][0].Height);
+        MapSize = new Point(BlockSize.X * (int)scale * mapBlockSize.X, BlockSize.Y * (int)scale * mapBlockSize.Y);
 
         for (int y = 0; y < mapBlockSize.Y; y++)
         {
             for (int x = 0; x < mapBlockSize.X; x++)
             {
-                if (gameboard[x, y] == 1)
+                if (gameboard[y, x] > 0)
                 {
 
-                    int tI = random.Next(0, textures.Count);
-                    int btI = random.Next(0, blockTypes.Count);
-                    var xP = x * BlockSize.X;
-                    var yP = y * BlockSize.Y;
+                    var type = (BlockType)gameboard[y, x];
+                    int textureIndex = random.Next(0, textures[type].Count);
+                    int yDrawingsCount = 1;
+                    int xDrawingsCount = 1;
 
-                    // var block =  BlockFactory.CreateBlock(blockTypes[blockTypeN]);
+                    var xPos = x * BlockSize.X;
+                    var yPos = y * BlockSize.Y;
 
-                    var rec = new Rectangle(0, 0, BlockSize.X, BlockSize.Y);
-
-                    var block = new SimpleBlock(
-                        textures[tI],
-                        initialPos: new Vector2(xP * scale, yP * scale),
-                        scale: scale, colliderTexture2d: text
+                    var block = BlockFactory.CreateBlock(
+                        type,
+                        textures[type][textureIndex],
+                        initialPos: new Vector2(xPos * scale, yPos * scale),
+                        scale: scale, colliderTexture2d: null,
+                        width: BlockSize.X, height: BlockSize.Y,
+                        xDrawingsCount: xDrawingsCount, yDrawingsCount: yDrawingsCount
                     );
-
+                    if (type == BlockType.TRAP)
+                    {
+                        var col = block.Collider;
+                        block.SetColliderSize(col.Width - (int)(col.Width * .4), col.Height - (int)(col.Height * .4));
+                    }
                     block.AddAnimation(AnimationType.IDLE, 1);
-                    block.SetColliderSize(BlockSize.X, BlockSize.Y);
 
-                    blocks[x, y] = block;
+                    blocks[y, x] = block;
 
-                    // System.Console.WriteLine(block.Collider);
-                    // System.Console.WriteLine(block.GetGameObjectPos());
                 }
             }
         }
@@ -140,46 +148,24 @@ public class Map
         {
             for (int x = 0; x < mapBlockSize.X; x++)
             {
-                if (blocks[x, y] == null)
+                if (blocks[y, x] == null)
                     continue;
-                gameObject.AddColliderTriggers(blocks[x, y]);
+                gameObject.AddColliderTriggers(blocks[y, x]);
             }
         }
         mapBoundaries.ForEach(b => gameObject.AddColliderTriggers(b));
     }
     private void CreateMapBoundaries(GraphicsDevice graphicsDevice)
     {
-        var v = graphicsDevice.Viewport;
+        var mapSize = MapSize;
         var thickness = 1;
         // left wall
-        mapBoundaries.Add(new SimpleBlock(emptyText, width: thickness, height: v.Height));
+        mapBoundaries.Add(BlockFactory.CreateBlock(BlockType.SIMPLE, emptyText, width: thickness, height: mapSize.Y, colliderTexture2d: emptyText));
         // Ceiling
-        mapBoundaries.Add(new SimpleBlock(emptyText, width: v.Width, height: thickness));
+        mapBoundaries.Add(BlockFactory.CreateBlock(BlockType.SIMPLE, emptyText, width: mapSize.X, height: thickness, colliderTexture2d: emptyText));
         // right wall
-        mapBoundaries.Add(new SimpleBlock(emptyText, new Vector2(v.Width, 0), width: thickness, height: v.Height));
+        mapBoundaries.Add(BlockFactory.CreateBlock(BlockType.SIMPLE, emptyText, initialPos: new Vector2(mapSize.X, 0), width: thickness, height: mapSize.Y, colliderTexture2d: emptyText));
         // Floor
-        mapBoundaries.Add(new SimpleBlock(emptyText, new Vector2(0, v.Height - thickness), width: v.Width, height: thickness));
-    }
-
-    private void UpdateBoundaries()
-    {
-        var list = mapBoundaries;
-
-        list[0].UpdateColliderPos(0, 0);
-        list[1].UpdateColliderPos(0, 0);
-
-        list[2].UpdateColliderPos(MapSize.X, 0);
-        list[3].UpdateColliderPos(0, MapSize.Y);
-    }
-    private void UpdateBoundaries(GraphicsDevice gD)
-    {
-        var v = gD.Viewport;
-        var list = mapBoundaries;
-
-        list[0].UpdateColliderPos(v.X, v.Y);
-        list[1].UpdateColliderPos(v.X, v.Y);
-
-        list[2].UpdateColliderPos(v.Width, v.Y);
-        list[3].UpdateColliderPos(v.X, v.Height);
+        mapBoundaries.Add(BlockFactory.CreateBlock(BlockType.TRAP, emptyText, initialPos: new Vector2(0, mapSize.Y + 50f), width: mapSize.X, height: thickness, colliderTexture2d: emptyText));
     }
 }

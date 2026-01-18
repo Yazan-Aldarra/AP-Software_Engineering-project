@@ -29,7 +29,6 @@ public class BaseWeaponDecorator<TGameObject> : EntityDecorator<TGameObject>, IA
             var collisions = CheckForCollisions<TGameObject>(this);
 
             HandleCollisions(this, collisions);
-            HandleAttackCollisions(this, collisions);
         }
         base.Update(gameTime);
 

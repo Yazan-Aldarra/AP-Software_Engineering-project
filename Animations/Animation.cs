@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace project;
 
-public enum AnimationType { IDLE, RUNNING, ATTACKING, DYING, IN_AIR, TAKING_DAMAGE, CROUCHING, IS_CROUCHED}
+public enum AnimationType { IDLE, RUNNING, ATTACKING, DYING, IN_AIR, TAKING_DAMAGE, CROUCHING, IS_CROUCHED , DEAD}
 public class Animation
 {
     public static readonly int FPS = 15;
@@ -13,11 +13,13 @@ public class Animation
     private List<AnimationFrame> frames;
     private int counter;
     private double secondsCounter = 0;
-    public Animation(AnimationFrame frame = null)
+    private float delayEachFrame;
+    public Animation(AnimationFrame frame = null, float delayEachFrame = 1f)
     {
         frames = new List<AnimationFrame>();
         if (frame != null)
             AddFrame(frame);
+        this.delayEachFrame = delayEachFrame;
     }
     public void AddFrame(AnimationFrame frame)
     {
@@ -54,6 +56,6 @@ public class Animation
     public void ResetAnimation()
     {
         counter = 0;
-        CurrentFrame =  frames[0];
+        CurrentFrame = frames[0];
     }
 }

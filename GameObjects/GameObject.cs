@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Media;
 
 namespace project;
 
@@ -40,7 +42,15 @@ public abstract class GameObject : IGameObject, ICollidable, IAnimatable
     public GameObjectState PreviousState { get; set; }
 
     // Constructor provides common initialization used by derived objects (like Player)
-    protected GameObject(Texture2D texture2D, Vector2? initialPos = null, int width = 10, int height = 10, float scale = 1f, Animation animation = null, int xDrawingsCount = 1, int yDrawingsCount = 1, Texture2D colliderTexture2d = null)
+    protected GameObject(Texture2D texture2D,
+            Vector2? initialPos = null,
+            int width = 10,
+            int height = 10,
+            float scale = 1f,
+            Animation animation = null,
+            int xDrawingsCount = 1,
+            int yDrawingsCount = 1,
+            Texture2D colliderTexture2d = null)
     {
         Texture2D = texture2D;
         this.xDrawingsCount = xDrawingsCount;
@@ -61,9 +71,6 @@ public abstract class GameObject : IGameObject, ICollidable, IAnimatable
         // initialize a default collider size from provided width/height
         Collider = new Rectangle((int)position.X, (int)position.Y, width * (int)Scale, height * (int)Scale);
         PreviousCollider = Collider;
-
-        // if (animation == null)
-        //     animations.Add(AnimationType.IDLE, new Animation(new AnimationFrame(Collider)));
     }
 
     // IGameObject.Update - base handles animation updates and resetting when state changes
@@ -78,6 +85,10 @@ public abstract class GameObject : IGameObject, ICollidable, IAnimatable
         if (State != null && animations.ContainsKey(State.AnimationType))
         {
             animations[State.AnimationType].Update(gameTime);
+        }
+        else if (animations.ContainsKey(AnimationType.IDLE))
+        {
+            animations[AnimationType.IDLE].Update(gameTime);
         }
     }
 
@@ -98,15 +109,18 @@ public abstract class GameObject : IGameObject, ICollidable, IAnimatable
     }
 
     // IAnimatable members
-    public void AddAnimation(AnimationType animationType, int spriteRowNum)
+    public virtual void AddAnimation(AnimationType animationType, int spriteRowNum, float delayEachFrame = 1f)
     {
         if (animations.ContainsKey(animationType))
             throw new Exception($"Animation {animationType} already exists");
-        animations.Add(animationType, new Animation());
+        animations.Add(animationType, new Animation(delayEachFrame: delayEachFrame));
         animations[animationType].ExtractAnimationFramesRow(Texture2D, xDrawingsCount, yDrawingsCount, spriteRowNum);
+
     }
 
-    public void CropAnimationFrames(int verticalCropping, int horizontalCropping, List<Animation> animationsNotToCrop = null)
+    public void CropAnimationFrames(int verticalCropping,
+        int horizontalCropping,
+        List<Animation> animationsNotToCrop = null)
     {
         List<Animation> toCrop;
         if (animationsNotToCrop != null)
@@ -118,17 +132,18 @@ public abstract class GameObject : IGameObject, ICollidable, IAnimatable
     }
 
     // ICollidable members - delegate to ColliderManager / provide helper methods used by other systems
-    public void AddColliderTriggers(ICollidable collider)
+    public virtual void AddColliderTriggers(ICollidable collider)
     {
         colliderManager.AddCollider(collider);
     }
 
-    public List<Collision> CheckForCollisions<T>(ICollidable collider) where T : GameObject, IMovable
+    public virtual List<Collision> CheckForCollisions<T>(ICollidable collider)
+        where T : GameObject, IMovable
     {
         return colliderManager.CheckForCollisions<T>(collider);
     }
 
-    public void HandleCollisions(ICollidable? decorator, List<Collision> colliders)
+    public virtual void HandleCollisions(ICollidable? decorator, List<Collision> colliders)
     {
         // If this GameObject also implements IMovable (like Player) call the generic handler via dynamic dispatch
         if (this is IMovable)
@@ -139,18 +154,13 @@ public abstract class GameObject : IGameObject, ICollidable, IAnimatable
         // Fallback: no-op for non-movable GameObjects (implementations that need full collision resolution should override)
     }
 
-    public void HandleAttackCollisions<T>(T obj, List<Collision> colliders) where T : ICollidable, IAttack
-    {
-        colliderManager.HandleAttackCollisions(obj, colliders);
-    }
-
-    public void SetColliderSize(int width, int height)
+    public virtual void SetColliderSize(int width, int height)
     {
         collider.Width = width * (int)Scale;
         collider.Height = height * (int)Scale;
     }
 
-    protected void UpdateColliderPos()
+    protected virtual void UpdateColliderPos()
     {
         if (State != null && animations.ContainsKey(State.AnimationType))
         {
@@ -159,14 +169,21 @@ public abstract class GameObject : IGameObject, ICollidable, IAnimatable
             collider.X = (int)vector.X;
             collider.Y = (int)vector.Y;
         }
-        else
+        else if (animations.ContainsKey(AnimationType.IDLE))
         {
             // Fallback keeps collider positioned at GameObject position
+            var rec = animations[AnimationType.IDLE].CurrentFrame.SourceRectangle;
+            var vector = Utils.GetCenteredColliderPosition(this, rec);
+            collider.X = (int)vector.X;
+            collider.Y = (int)vector.Y;
+        }
+        else
+        {
             collider.X = (int)position.X;
             collider.Y = (int)position.Y;
         }
     }
-    public void UpdateColliderPos(int x, int y)
+    public virtual void UpdateColliderPos(int x, int y)
     {
         collider.X = x;
         collider.Y = y;

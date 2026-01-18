@@ -1,0 +1,5 @@
+Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds
+"D:/yazan/school/ap-ti-j2/software_engineering/project/Content/blocks/Tile_01.png","D:/yazan/school/ap-ti-j2/software_engineering/project/Content/bin/blocks/Tile_01.xnb","TextureProcessor","Texture2DContent",27852,65621,0.143969
+"D:/yazan/school/ap-ti-j2/software_engineering/project/Content/blocks/Tile_02.png","D:/yazan/school/ap-ti-j2/software_engineering/project/Content/bin/blocks/Tile_02.xnb","TextureProcessor","Texture2DContent",30106,65621,0.015936
+"D:/yazan/school/ap-ti-j2/software_engineering/project/Content/blocks/Trap_Tile_01.png","D:/yazan/school/ap-ti-j2/software_engineering/project/Content/bin/blocks/Trap_Tile_01.xnb","TextureProcessor","Texture2DContent",20490,65621,0.014287
+"D:/yazan/school/ap-ti-j2/software_engineering/project/Content/Player_Sprite.png","D:/yazan/school/ap-ti-j2/software_engineering/project/Content/bin/Player_Sprite.xnb","TextureProcessor","Texture2DContent",22891,1572949,0.0830262

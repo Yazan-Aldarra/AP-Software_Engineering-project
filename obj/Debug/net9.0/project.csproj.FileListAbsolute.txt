@@ -76,3 +76,11 @@ D:\yazan\School\ap-ti-j2\software_engineering\project\bin\Debug\net9.0\Content\b
 D:\yazan\School\ap-ti-j2\software_engineering\project\bin\Debug\net9.0\Content\blocks\Tile_04.xnb
 D:\yazan\School\ap-ti-j2\software_engineering\project\bin\Debug\net9.0\Content\blocks\Tile_05.xnb
 D:\yazan\School\ap-ti-j2\software_engineering\project\bin\Debug\net9.0\Content\blocks\Tile_06.xnb
+d:\yazan\school\ap-ti-j2\software_engineering\project\bin\Debug\net9.0\Content\Tile_01.xnb
+d:\yazan\school\ap-ti-j2\software_engineering\project\bin\Debug\net9.0\Content\Tile_02.xnb
+d:\yazan\school\ap-ti-j2\software_engineering\project\bin\Debug\net9.0\Content\Tile_03.xnb
+d:\yazan\school\ap-ti-j2\software_engineering\project\bin\Debug\net9.0\Content\Tile_04.xnb
+d:\yazan\school\ap-ti-j2\software_engineering\project\bin\Debug\net9.0\Content\Tile_05.xnb
+d:\yazan\school\ap-ti-j2\software_engineering\project\bin\Debug\net9.0\Content\Trap_Tile_01.xnb
+d:\yazan\school\ap-ti-j2\software_engineering\project\bin\Debug\net9.0\Content\blocks\Trap_Tile_01.xnb
+D:\yazan\school\ap-ti-j2\software_engineering\project\bin\Debug\net9.0\Content\blocks\Trap_Tile_02.xnb

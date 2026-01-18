@@ -15,6 +15,6 @@ public interface ICollidable
     public void AddColliderTriggers(ICollidable collider);
     public List<Collision> CheckForCollisions<T>(ICollidable collider) where T : GameObject, IMovable;
     public void HandleCollisions(ICollidable? decorator, List<Collision> colliders);
-    public void HandleAttackCollisions<T>(T obj, List<Collision> colliders)
-        where T : ICollidable, IAttack;
+    // public void HandleInComingAttacks<T>(T obj, List<Collision> colliders)
+    //     where T : ICollidable, IHasHealth;
 }
