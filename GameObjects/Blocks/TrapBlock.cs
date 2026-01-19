@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -29,4 +30,23 @@ public class TrapBlock : Block, IAttacker, IAttack
     }
     public AttackType FutureAttack { get; set; }
     public float Damage { get; set; } = 100f;
+    public bool isActive { get; set; } = true;
+    private float reAttackTimer = 0f;
+    private float reAttackDelay = Animation.FPS * 2;
+
+    public override void Update(GameTime gameTime)
+    {
+        base.Update(gameTime);
+        if (--reAttackTimer <= 0)
+        {
+            isActive = true;
+        }
+    }
+    public void UseAttack(IHasHealth hasHealth)
+    {
+        if (isActive)
+            hasHealth.DecreaseHealth(Damage);
+        isActive = false;
+        reAttackTimer = reAttackDelay;
+    }
 }

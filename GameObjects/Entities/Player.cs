@@ -89,7 +89,7 @@ public class Player : Entity, IAttacker, IGravityAffected, IHasHealth
     public void DecreaseHealth(float value)
     {
         Health -= value;
-        if (Health < 0 && !(State is DyingState) && !(State is DeadState))
+        if (Health <= 0 && !(State is DyingState) && !(State is DeadState))
         {
             State = new DyingState(this);
         }

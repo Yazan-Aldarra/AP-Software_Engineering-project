@@ -2,6 +2,7 @@
 using Interfaces;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace project;
 
@@ -11,6 +12,7 @@ public abstract class EntityDecorator<TGameObject> : GameObject
     protected TGameObject gameObject;
 
     public Vector2 ParentSpeed { get; set; }
+    public Vector2 InitialPos { get; set; } = Vector2.Zero;
 
     public EntityDecorator(TGameObject gameObject, Texture2D texture2D)
         : base(texture2D)
@@ -40,8 +42,8 @@ public abstract class EntityDecorator<TGameObject> : GameObject
     protected override void UpdateColliderPos()
     {
         var c = Collider;
-        c.X = gameObject.Collider.X;
-        c.Y = gameObject.Collider.Y;
+        c.X = gameObject.Collider.X + (int)InitialPos.X;
+        c.Y = gameObject.Collider.Y + (int)InitialPos.Y;
         Collider = c;
     }
 
@@ -62,7 +64,7 @@ public abstract class EntityDecorator<TGameObject> : GameObject
     {
         gameObject.HandleCollisions(decorator, colliders);
     }
-    public override List<Collision> CheckForCollisions<T>(ICollidable collider) 
+    public override List<Collision> CheckForCollisions<T>(ICollidable collider)
     {
         return gameObject.CheckForCollisions<T>(collider);
     }

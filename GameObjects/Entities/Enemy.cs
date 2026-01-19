@@ -19,7 +19,7 @@ public class Enemy : Entity, IHasHealth, IAttacker, IGravityAffected
         // register animations (same rows as Player)
         AddAnimation(AnimationType.IDLE, 4);
         AddAnimation(AnimationType.IN_AIR, 4);
-        
+
         AddAnimation(AnimationType.RUNNING, 5);
         AddAnimation(AnimationType.ATTACKING, 1);
         AddAnimation(AnimationType.TAKING_DAMAGE, 6);
@@ -50,10 +50,14 @@ public class Enemy : Entity, IHasHealth, IAttacker, IGravityAffected
     }
     public void DecreaseHealth(float value)
     {
+        System.Console.WriteLine($"Before: {Health}");
         Health -= value;
-        if (Health < 0 && !(State is DyingState) && !(State is DeadState))
+        System.Console.WriteLine($"After: {Health}");
+        if (Health <= 0 && !(State is DyingState) && !(State is DeadState))
         {
             State = new DyingState(this);
         }
+        else
+            State = new TakingDamageState(this);
     }
 }

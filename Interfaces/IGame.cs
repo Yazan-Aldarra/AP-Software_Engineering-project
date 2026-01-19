@@ -10,4 +10,5 @@ public interface IGame
     public bool isGamePaused { get; set;}
     public bool isGameWon { get; set; }
     public void Exit();
+    public void RestartGame();
 }

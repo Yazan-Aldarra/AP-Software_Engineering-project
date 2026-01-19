@@ -6,7 +6,7 @@ namespace project;
 
 public class DyingState : GameObjectState
 {
-    int dyingTime = Animation.FPS;
+    int dyingTime = 2 * Animation.FPS;
     public DyingState(IGameObject gameObject) : base(gameObject)
     {
         Update();

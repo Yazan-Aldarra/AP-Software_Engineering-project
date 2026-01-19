@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.Serialization;
 using Interfaces;
@@ -18,6 +19,9 @@ public class ColliderManager
 
         foreach (var otherCol in otherColliders)
         {
+            if (otherCol is IAttack attack && !(otherCol is IAttacker) && !attack.isActive)
+                continue;
+
             // Use the velocity-aware hit test to avoid corner ambiguity and tunneling
             var hitSide = GetHitSide(collider.PreviousCollider, collider.Collider, otherCol.Collider);
             var overlap = GetOverlappedAmount(hitSide, collider.Collider, otherCol.Collider);
@@ -79,7 +83,7 @@ public class ColliderManager
         {
             if (col.Collider is IAttack attack)
             {
-                obj.DecreaseHealth(attack.Damage);
+                attack.UseAttack(obj);
             }
         }
     }
@@ -104,7 +108,7 @@ public class ColliderManager
         );
 
         // If we were not intersecting last frame, we can infer the entry side by where we came from.
-        if (!prevMoving.Intersects(solid)) 
+        if (!prevMoving.Intersects(solid))
         {
             // ignore value otherwise object wil jitter
             var ignore = 1;

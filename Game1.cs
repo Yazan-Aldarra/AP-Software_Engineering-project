@@ -11,12 +11,13 @@ using MonoGameGum;
 
 namespace project;
 
-public enum ButtonType { START_GAME, QUIT, RESTART, RESUME }
 public class Game1 : Game, IGame
 {
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
     private GameManager gameManager;
+
+    private GumService Gum => GumService.Default;
 
     public bool isGameWon { get; set; } = false;
     public bool isGameOver { get; set; } = false;
@@ -33,6 +34,7 @@ public class Game1 : Game, IGame
 
     protected override void Initialize()
     {
+        Gum.Initialize(this);
 
         base.Initialize();
     }
@@ -51,6 +53,8 @@ public class Game1 : Game, IGame
 
         gameManager.Update(gameTime, GraphicsDevice);
 
+        Gum.Update(gameTime);
+
         base.Update(gameTime);
     }
 
@@ -62,6 +66,7 @@ public class Game1 : Game, IGame
         _spriteBatch.Begin(transformMatrix: GameManager.TRANSLATION);
 
         gameManager.Draw(_spriteBatch);
+        Gum.Draw();
 
         _spriteBatch.End();
         base.Draw(gameTime);
@@ -69,5 +74,16 @@ public class Game1 : Game, IGame
     private void InitializeGameObjects()
     {
         gameManager = new GameManager(this, Content, GraphicsDevice);
+    }
+
+    public void RestartGame()
+    {
+        Gum.Root.Children.Clear();
+        gameManager = new GameManager(this, Content, GraphicsDevice);
+
+        isGameWon = false;
+        isGameOver = false;
+        isGameStarted = false;
+        isGamePaused = false;
     }
 }

@@ -6,9 +6,15 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGameGum;
 using System;
+using System.Runtime.CompilerServices;
+using System.Linq.Expressions;
+using Gum.Forms.DefaultVisuals;
+using System.Linq;
 
 namespace project;
 
+public enum ButtonType { START_GAME, QUIT, RESTART, RESUME }
+public enum MenuLabelsType { YOU_WON, GAME_OVER }
 public class GameManager
 {
 
@@ -19,26 +25,27 @@ public class GameManager
     private ContentManager content;
 
     private Map map;
-    
+
     private Player player;
     private Vector2 startPosition = new Vector2(50, 200);
     private GameObject playerDecorator;
     private Texture2D playerText;
     private Texture2D emptyText;
 
-    private List<Enemy> enemies;
+    private List<GameObject> enemies;
     private Texture2D enemyText;
 
     private StackPanel mainPanel;
-    private GumService Gum => GumService.Default;
+    // private GumService gum;
     private Dictionary<ButtonType, Button> menuButtons;
+    private Dictionary<MenuLabelsType, Label> menuTexts;
 
     public GameManager(IGame game, ContentManager content, GraphicsDevice graphicsDevice)
     {
         this.graphicsDevice = graphicsDevice;
         this.content = content;
 
-        enemies = new List<Enemy>();
+        enemies = new List<GameObject>();
         emptyText = new Texture2D(graphicsDevice, 1, 1);
         emptyText.SetData(new[] { Color.White });
 
@@ -46,8 +53,8 @@ public class GameManager
         enemyText = content.Load<Texture2D>("Skeleton_Sprite");
 
         this.game = game;
-
-        InitializeGameObjects();
+        // this.gum = gum;
+        InitGameObjects();
     }
 
     private void CalculateTranslation(GraphicsDevice graphicsDevice)
@@ -63,31 +70,48 @@ public class GameManager
 
     public void Update(GameTime gameTime, GraphicsDevice graphicsDevice)
     {
-        Gum.Update(gameTime);
 
-        if (game.isGameStarted == true && game.isGamePaused == false && game.isGameOver == false)
+
+        if (game.isGameStarted == true && game.isGamePaused == false && game.isGameOver == false && game.isGameWon == false)
         {
             playerDecorator.Update(gameTime);
+
+            if (player.State is DeadState)
+                GameOver();
+
+            UpdateEnemies(gameTime);
+
+            ClearDeadEnemies();
+            CheckIsGameWon();
+
             map.Update(gameTime, graphicsDevice);
             CalculateTranslation(graphicsDevice);
         }
     }
-
+    private void CheckIsGameWon()
+    {
+        if (enemies.Count <= 0)
+            WinGame();
+    }
+    private void ClearDeadEnemies()
+    {
+        enemies = enemies.Where(e => !(e.State is DeadState)).ToList();
+    }
     public void Draw(SpriteBatch spriteBatch)
     {
 
-        Gum.Draw();
 
-        if (game.isGameStarted == true && game.isGamePaused == false && game.isGameOver == false)
+        if (game.isGameStarted == true && game.isGamePaused == false && game.isGameOver == false && game.isGameWon == false)
         {
 
+            DrawEnemies(spriteBatch);
             map.Draw(spriteBatch);
             playerDecorator.Draw(spriteBatch);
         }
 
     }
 
-    private void InitializeGameObjects()
+    private void InitGameObjects()
     {
         map = new Map(content, graphicsDevice, emptyText);
 
@@ -97,19 +121,17 @@ public class GameManager
 
         playerDecorator = new BaseWeaponDecorator<Player>(player as Player, emptyText)
         { Scale = 3, Texture2D = emptyText };
+        (playerDecorator as BaseWeaponDecorator<Player>).InitialPos = new Vector2(player.Collider.Width,20f);
 
         playerDecorator.SetColliderSize(25, 15);
 
         map.AddBlocksAsTrigger(player);
 
-        InitGum(game);
-        InitStartMenu();
-    }
-    private void InitEndMenu()
-    {
+        SpawnEnemies(1);
 
+        InitMenu();
     }
-    private void InitStartMenu()
+    private void InitMenu()
     {
         mainPanel = new StackPanel();
 
@@ -122,11 +144,29 @@ public class GameManager
         {
             {ButtonType.START_GAME, new Button()},
             {ButtonType.RESUME, new Button()},
+            {ButtonType.RESTART,  new Button()},
             {ButtonType.QUIT, new Button()},
-            {ButtonType.RESTART,  new Button()}
+        };
+        menuTexts = new Dictionary<MenuLabelsType, Label>()
+        {
+            {MenuLabelsType.YOU_WON, new Label()},
+            {MenuLabelsType.GAME_OVER, new Label()},
         };
 
+        foreach (var keyPair in menuTexts)
+        {
 
+            var key = keyPair.Key;
+            var label = keyPair.Value;
+            // Make from MenuLabelsType the text for the label
+            var str = string.Join(" ", key.ToString().Split("_"));
+            label.Text = $"{str[0].ToString().ToUpper()}{str.Substring(1).ToLower()}";
+
+            label.Anchor(Anchor.Center);
+
+            mainPanel.AddChild(label);
+            SetFrameworkEl(label, false);
+        }
         foreach (var keyPair in menuButtons)
         {
             var key = keyPair.Key;
@@ -142,28 +182,23 @@ public class GameManager
             {
                 btn.Click += (_, _) =>
                 {
-                    mainPanel.IsEnabled = false;
-                    mainPanel.IsVisible = false;
 
-                    btn.IsEnabled = false;
-                    btn.IsVisible = false;
+                    SetFrameworkEl(mainPanel, false);
+                    SetFrameworkEl(btn, false);
 
-                    menuButtons[ButtonType.RESUME].IsEnabled = true;
-                    menuButtons[ButtonType.RESUME].IsVisible = true;
+                    SetFrameworkEl(menuButtons[ButtonType.RESUME], true);
+                    SetFrameworkEl(menuButtons[ButtonType.RESTART], true);
 
                     game.isGameStarted = true;
                 };
             }
             else if (key == ButtonType.RESUME)
             {
-                btn.IsVisible = false;
-                btn.IsEnabled = false;
+                SetFrameworkEl(btn, false);
 
                 btn.Click += (_, _) =>
                 {
-                    mainPanel.IsEnabled = false;
-                    mainPanel.IsVisible = false;
-
+                    SetFrameworkEl(mainPanel, false);
                     game.isGamePaused = false;
                 };
             }
@@ -173,37 +208,89 @@ public class GameManager
             }
             else if (key == ButtonType.RESTART)
             {
-                btn.Click += (_, _) => RestartGame();
+                SetFrameworkEl(btn, false);
+                btn.Click += (_, _) => game.RestartGame();
             }
         }
 
     }
     public void PauseGame()
     {
-        mainPanel.IsVisible = true;
-        mainPanel.IsEnabled = true;
+        SetFrameworkEl(mainPanel, true);
         game.isGamePaused = true;
-    }
-    public void InitGum(IGame game)
-    {
-        Gum.Initialize(game as Game);
-    }
-    public void RestartGame()
-    {
-        player.Position = startPosition;
-        player.Health = 100f;
-
-        enemies?.Clear();
-        SpawnEnemies(3);
-
-        game.isGameOver = false;
     }
     private void SpawnEnemies(int count)
     {
         for (int i = 0; i < count; i++)
         {
-            // var enemy =  new Enemy(enemyText, new VisionReader(), );
-            // enemies.Add(enemy);
+            var reader = new VisionReader<Player>();
+            var enemy = new Enemy(enemyText, reader, initialPos: new Vector2(300, 240), xDrawingsCount: 8, yDrawingsCount: 6, colliderTexture2d: emptyText, scale: 3);
+
+            enemy.SetColliderSize(20, 45);
+            enemy.CropAnimationFrames(30, 30);
+
+            enemy.AddColliderTriggers(playerDecorator);
+            player.AddColliderTriggers(enemy);
+            var enemyDec = new BaseWeaponDecorator<Enemy>(enemy, emptyText)
+            { Scale = 3, Texture2D = emptyText };
+
+            enemyDec.SetColliderSize(20, 45);
+            enemyDec.InitialPos = new Vector2(-enemyDec.Collider.Width, 0);
+            player.AddColliderTriggers(enemyDec);
+
+            map.AddBlocksAsTrigger(enemy);
+            reader.Entity = player;
+            reader.Owner = enemy;
+            enemies.Add(enemyDec);
+        }
+    }
+    private void WinGame()
+    {
+        game.isGameWon = true;
+
+        SetFrameworkEl(mainPanel, true);
+        DisableAllFrameworkEl();
+
+        EnableEndGameMenu();
+        SetFrameworkEl(menuTexts[MenuLabelsType.YOU_WON], true);
+    }
+    private void GameOver()
+    {
+        game.isGameOver = true;
+
+        SetFrameworkEl(mainPanel, true);
+        DisableAllFrameworkEl();
+
+        EnableEndGameMenu();
+        SetFrameworkEl(menuTexts[MenuLabelsType.GAME_OVER], true);
+    }
+    private void EnableEndGameMenu()
+    {
+        SetFrameworkEl(menuButtons[ButtonType.RESTART], true);
+        SetFrameworkEl(menuButtons[ButtonType.QUIT], true);
+    }
+    private void DisableAllFrameworkEl()
+    {
+        foreach (var item in mainPanel.Children)
+        {
+            SetFrameworkEl(item, false);
+        }
+
+    }
+    private void DrawEnemies(SpriteBatch spriteBatch) => enemies.ForEach(e => e.Draw(spriteBatch));
+    private void UpdateEnemies(GameTime gameTime) => enemies.ForEach(e => e.Update(gameTime));
+
+    private void SetFrameworkEl(FrameworkElement frameworkElement, bool state)
+    {
+        if (state)
+        {
+            frameworkElement.IsVisible = true;
+            frameworkElement.IsEnabled = true;
+        }
+        else
+        {
+            frameworkElement.IsVisible = false;
+            frameworkElement.IsEnabled = false;
         }
     }
 }
