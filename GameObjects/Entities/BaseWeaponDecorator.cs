@@ -22,7 +22,7 @@ public class BaseWeaponDecorator<TGameObject> : EntityDecorator<TGameObject>, IA
         base.Draw(spriteBatch);
 
         if (gameObject.State is AttackingState)
-            spriteBatch.Draw(Texture2D, Collider, Color.Red * 0.5f);
+            spriteBatch.Draw(Texture2D, Collider, Color.White*0);
     }
     public override void Update(GameTime gameTime)
     {
@@ -35,8 +35,6 @@ public class BaseWeaponDecorator<TGameObject> : EntityDecorator<TGameObject>, IA
         }
         base.Update(gameTime);
 
-        if (isActive)
-            System.Console.WriteLine($"PRE: {isActive}");
         if (reAttackTimer <= 0 && gameObject.State is AttackingState)
         {
             isActive = true;
@@ -49,8 +47,6 @@ public class BaseWeaponDecorator<TGameObject> : EntityDecorator<TGameObject>, IA
         {
             isActive = false;
         }
-        if (isActive)
-            System.Console.WriteLine($"After: {isActive}");
     }
     protected override void UpdateColliderPos()
     {

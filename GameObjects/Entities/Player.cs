@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -70,7 +71,9 @@ public class Player : Entity, IAttacker, IGravityAffected, IHasHealth
         base.Update(gameTime);
 
         var collisions = colliderManager.CheckForCollisions<Entity>(this);
-        var tmp = colliderManager.GetHighestCollisions(collisions);
+        var solid =  collisions.Where(c => !(c.Collider is IAttack) && !(c.Collider is EntityDecorator<Enemy>)).ToList();
+        var tmp = colliderManager.GetHighestCollisions(solid);
+        
         colliderManager.HandleCollisions(this, null, tmp);
 
         SetOverlappedObjectBack(this, tmp);

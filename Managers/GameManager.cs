@@ -124,11 +124,11 @@ public class GameManager
     {
         map = new Map(content, graphicsDevice, emptyText);
 
-        player = new Player(playerText, new KeyboardReader(), initialPos: startPosition, xDrawingsCount: 8, yDrawingsCount: 8, colliderTexture2d: emptyText);
+        player = new Player(playerText, new KeyboardReader(), initialPos: startPosition, xDrawingsCount: 8, yDrawingsCount: 8, colliderTexture2d: null);
         (player as Player).CropAnimationFrames(0, 30);
         (player as Player).SetColliderSize(30, 35);
 
-        playerDecorator = new BaseWeaponDecorator<Player>(player as Player, emptyText)
+        playerDecorator = new BaseWeaponDecorator<Player>(player as Player, null)
         { Scale = 3, Texture2D = emptyText };
         (playerDecorator as BaseWeaponDecorator<Player>).InitialPos = new Vector2(player.Collider.Width, 20f);
 
@@ -136,7 +136,7 @@ public class GameManager
 
         map.AddBlocksAsTrigger(player);
 
-        SpawnEnemies(1);
+        SpawnEnemies(2);
 
         InitMenu();
     }
@@ -232,15 +232,16 @@ public class GameManager
     {
         for (int i = 0; i < count; i++)
         {
+            var pos = 300f;
             var reader = new VisionReader<Player>();
-            var enemy = new Enemy(enemyText, reader, initialPos: new Vector2(300, 240), xDrawingsCount: 8, yDrawingsCount: 6, colliderTexture2d: emptyText, scale: 3);
+            var enemy = new Enemy(enemyText, reader, initialPos: new Vector2(pos * (i + 1), 240), xDrawingsCount: 8, yDrawingsCount: 6, colliderTexture2d: null, scale: 3);
 
-            enemy.SetColliderSize(20, 45);
-            enemy.CropAnimationFrames(30, 30);
+            enemy.SetColliderSize(20, 35);
+            enemy.CropAnimationFrames(0, 30);
 
             enemy.AddColliderTriggers(playerDecorator);
             player.AddColliderTriggers(enemy);
-            var enemyDec = new BaseWeaponDecorator<Enemy>(enemy, emptyText)
+            var enemyDec = new BaseWeaponDecorator<Enemy>(enemy, null)
             { Scale = 3, Texture2D = emptyText };
 
             enemyDec.SetColliderSize(20, 45);
@@ -261,7 +262,7 @@ public class GameManager
         DisableAllFrameworkEl();
 
         EnableEndGameMenu();
-        SetFrameworkEl(menuTexts[MenuLabelsType.YOU_WON], true);
+        // SetFrameworkEl(menuTexts[MenuLabelsType.YOU_WON], true);
     }
     private void GameOver()
     {
