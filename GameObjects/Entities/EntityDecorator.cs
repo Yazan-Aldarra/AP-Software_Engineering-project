@@ -10,7 +10,7 @@ public abstract class EntityDecorator<TGameObject> : GameObject
     where TGameObject : Entity
 {
     protected TGameObject gameObject;
-
+    public TGameObject GameObject => gameObject;
     public Vector2 ParentSpeed { get; set; }
     public Vector2 InitialPos { get; set; } = Vector2.Zero;
 

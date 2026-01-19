@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <SourceFile>D:/yazan/school/ap-ti-j2/software_engineering/project/Content/Skeleton_Sprite.png</SourceFile>
-  <SourceTime>2026-01-19T04:49:29.5095926+01:00</SourceTime>
-  <DestFile>D:/yazan/school/ap-ti-j2/software_engineering/project/Content/bin/DesktopGL/Content/Skeleton_Sprite.xnb</DestFile>
-  <DestTime>2026-01-19T04:49:36.1931877+01:00</DestTime>
+  <SourceFile>C:/Users/yazan/OneDrive/سطح المكتب/AP Hogeschool/AP-J2/software_engineering/project/Content/Skeleton_Sprite.png</SourceFile>
+  <SourceTime>2026-01-19T06:47:54.9996473+01:00</SourceTime>
+  <DestFile>C:/Users/yazan/OneDrive/سطح المكتب/AP Hogeschool/AP-J2/software_engineering/project/Content/bin/DesktopGL/Content/Skeleton_Sprite.xnb</DestFile>
+  <DestTime>2026-01-19T06:48:07.4613718+01:00</DestTime>
   <Importer>TextureImporter</Importer>
   <ImporterTime>2025-10-20T16:25:32+02:00</ImporterTime>
   <Processor>TextureProcessor</Processor>

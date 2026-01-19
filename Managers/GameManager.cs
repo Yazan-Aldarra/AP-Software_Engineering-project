@@ -95,7 +95,16 @@ public class GameManager
     }
     private void ClearDeadEnemies()
     {
-        enemies = enemies.Where(e => !(e.State is DeadState)).ToList();
+        enemies = enemies.Where(e =>
+        {
+            Entity obj = e as Entity;
+            if (e is EntityDecorator<Enemy> ed)
+                obj = ed.GameObject;
+            else
+                obj = e as Entity;
+            return !(obj.State is DeadState);
+        }
+        ).ToList();
     }
     public void Draw(SpriteBatch spriteBatch)
     {
@@ -121,7 +130,7 @@ public class GameManager
 
         playerDecorator = new BaseWeaponDecorator<Player>(player as Player, emptyText)
         { Scale = 3, Texture2D = emptyText };
-        (playerDecorator as BaseWeaponDecorator<Player>).InitialPos = new Vector2(player.Collider.Width,20f);
+        (playerDecorator as BaseWeaponDecorator<Player>).InitialPos = new Vector2(player.Collider.Width, 20f);
 
         playerDecorator.SetColliderSize(25, 15);
 

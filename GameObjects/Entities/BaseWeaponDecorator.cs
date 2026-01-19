@@ -7,13 +7,12 @@ using Microsoft.Xna.Framework.Graphics;
 namespace project;
 
 public class BaseWeaponDecorator<TGameObject> : EntityDecorator<TGameObject>, IAttack
-    where TGameObject : Entity, IAttacker
+    where TGameObject : Entity
 {
     public float Damage { get; set; } = 50f;
     public bool isActive { get; set; } = false;
     private float reAttackTimer = 0f;
     private float reAttackDelay = Animation.FPS * 2;
-    public TGameObject GameObject => gameObject;
     public BaseWeaponDecorator(TGameObject gameObject, Texture2D texture2D)
         : base(gameObject, texture2D)
     {
