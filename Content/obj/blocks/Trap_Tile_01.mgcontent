@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <SourceFile>D:/yazan/school/ap-ti-j2/software_engineering/project/Content/blocks/Trap_Tile_01.png</SourceFile>
-  <SourceTime>2026-01-18T17:40:16.7450529+01:00</SourceTime>
+  <SourceTime>2026-01-18T18:14:52.6021394+01:00</SourceTime>
   <DestFile>D:/yazan/school/ap-ti-j2/software_engineering/project/Content/bin/blocks/Trap_Tile_01.xnb</DestFile>
-  <DestTime>2026-01-18T17:46:59.3578113+01:00</DestTime>
+  <DestTime>2026-01-19T02:16:41.2811955+01:00</DestTime>
   <Importer>TextureImporter</Importer>
   <ImporterTime>2025-10-20T16:25:32+02:00</ImporterTime>
   <Processor>TextureProcessor</Processor>

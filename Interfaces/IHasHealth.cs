@@ -5,6 +5,6 @@ namespace project;
 
 public interface IHasHealth
 {
-    public float Health { get; }
+    public float Health { get; set; }
     public void DecreaseHealth(float value);
 }

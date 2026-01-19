@@ -84,3 +84,9 @@ d:\yazan\school\ap-ti-j2\software_engineering\project\bin\Debug\net9.0\Content\T
 d:\yazan\school\ap-ti-j2\software_engineering\project\bin\Debug\net9.0\Content\Trap_Tile_01.xnb
 d:\yazan\school\ap-ti-j2\software_engineering\project\bin\Debug\net9.0\Content\blocks\Trap_Tile_01.xnb
 D:\yazan\school\ap-ti-j2\software_engineering\project\bin\Debug\net9.0\Content\blocks\Trap_Tile_02.xnb
+d:\yazan\school\ap-ti-j2\software_engineering\project\bin\Debug\net9.0\GumCommon.dll
+d:\yazan\school\ap-ti-j2\software_engineering\project\bin\Debug\net9.0\FlatRedBall.InterpolationCore.dll
+d:\yazan\school\ap-ti-j2\software_engineering\project\bin\Debug\net9.0\MonoGameGum.dll
+d:\yazan\school\ap-ti-j2\software_engineering\project\bin\Debug\net9.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+d:\yazan\school\ap-ti-j2\software_engineering\project\bin\Debug\net9.0\TextCopy.dll
+d:\yazan\school\ap-ti-j2\software_engineering\project\bin\Debug\net9.0\Content\Skeleton_Sprite.xnb

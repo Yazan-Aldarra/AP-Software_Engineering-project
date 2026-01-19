@@ -15,29 +15,28 @@ public class Player : Entity, IAttacker, IGravityAffected, IHasHealth
 
     public AttackType FutureAttack { get; set; }
 
-    private float health;
-    public float Health => health;
+    public float Health { get; set; }
 
     public Player(Texture2D texture2D,
-			IInputReader inputReader,
-			Vector2? initialPos = null,
-			int width = 10,
-			int height = 10,
-			float scale = 2f,
-			Animation animation = null,
-			int xDrawingsCount = 8,
-			int yDrawingsCount = 8,
-			Texture2D colliderTexture2d = null)
+            IInputReader inputReader,
+            Vector2? initialPos = null,
+            int width = 10,
+            int height = 10,
+            float scale = 2f,
+            Animation animation = null,
+            int xDrawingsCount = 8,
+            int yDrawingsCount = 8,
+            Texture2D colliderTexture2d = null)
         : base(texture2D,
-			inputReader,
-			initialPos,
-			width,
-			height,
-			scale,
-			animation,
-			xDrawingsCount,
-			yDrawingsCount,
-			colliderTexture2d)
+            inputReader,
+            initialPos,
+            width,
+            height,
+            scale,
+            animation,
+            xDrawingsCount,
+            yDrawingsCount,
+            colliderTexture2d)
     {
         Position = initialPos ?? new Vector2(0, 100);
         FutureAttack = AttackType.NONE;
@@ -58,7 +57,7 @@ public class Player : Entity, IAttacker, IGravityAffected, IHasHealth
         Collider = new Rectangle(0, 0, rec.Width * (int)Scale, rec.Height * (int)Scale);
         AirMoveSpeed *= 1.5f;
         JumpPower *= 1.8f;
-        health =  100f;
+        Health = 100f;
     }
 
     public override void Update(GameTime gameTime)
@@ -89,8 +88,8 @@ public class Player : Entity, IAttacker, IGravityAffected, IHasHealth
 
     public void DecreaseHealth(float value)
     {
-        health -= value;
-        if (health < 0 && !(State is DyingState) && !(State is DeadState))
+        Health -= value;
+        if (Health < 0 && !(State is DyingState) && !(State is DeadState))
         {
             State = new DyingState(this);
         }
